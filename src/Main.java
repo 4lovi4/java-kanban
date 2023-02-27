@@ -22,13 +22,13 @@ public class Main {
                 0, Status.NEW, 0);
         SubTask subTaskThree = new SubTask("Подзадача 3", "Подзадача из 2го эпика",
                 0, Status.NEW, 0);
-        manager.create(taskOne);
-        manager.create(taskTwo);
-        manager.create(epicOne);
-        manager.create(epicTwo);
-        manager.create(subTaskOne);
-        manager.create(subTaskTwo);
-        manager.create(subTaskThree);
+        manager.addNewTask(taskOne);
+        manager.addNewTask(taskTwo);
+        manager.addNewEpic(epicOne);
+        manager.addNewEpic(epicTwo);
+        manager.addNewSubTask(subTaskOne);
+        manager.addNewSubTask(subTaskTwo);
+        manager.addNewSubTask(subTaskThree);
         ArrayList<Task> allTasks = manager.getAllTasksList();
         ArrayList<Epic> allEpics = manager.getAllEpicsList();
         ArrayList<SubTask> allSubTasks = manager.getAllSubTasksList();
@@ -42,9 +42,9 @@ public class Main {
         taskOne = allTasks.get(0);
         taskTwo = allTasks.get(1);
         taskOne.setStatus(Status.IN_PROGRESS);
-        manager.update(taskOne);
+        manager.updateTask(taskOne);
         taskTwo.setStatus(Status.DONE);
-        manager.update(taskTwo);
+        manager.updateTask(taskTwo);
 
         epicOne = allEpics.get(0);
         epicTwo = allEpics.get(1);
@@ -60,11 +60,11 @@ public class Main {
         epicOne.addToSubTasksIdList(subTaskOne.getId());
         epicOne.addToSubTasksIdList(subTaskTwo.getId());
         epicTwo.addToSubTasksIdList(subTaskThree.getId());
-        manager.update(epicOne);
-        manager.update(epicTwo);
-        manager.update(subTaskOne);
-        manager.update(subTaskTwo);
-        manager.update(subTaskThree);
+        manager.updateEpic(epicOne);
+        manager.updateEpic(epicTwo);
+        manager.updateSubTask(subTaskOne);
+        manager.updateSubTask(subTaskTwo);
+        manager.updateSubTask(subTaskThree);
 
         //Удалим таску и эпик
         manager.deleteTask(taskOne.getId());

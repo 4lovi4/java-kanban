@@ -65,40 +65,40 @@ public class TaskManager {
         return subTaskMap.get(id);
     }
 
-    public void create(Task task) {
+    public void addNewTask(Task task) {
         taskIdCounter++;
         setTaskIdCounter(taskIdCounter);
         task.setId(taskIdCounter);
         simpleTaskMap.put(task.getId(), task);
     }
 
-    public void create(Epic epic) {
+    public void addNewEpic(Epic epic) {
         taskIdCounter++;
         epic.setId(taskIdCounter);
         updateEpicStatus(epic.getId());
         epicMap.put(epic.getId(), epic);
     }
 
-    public void create(SubTask subTask) {
+    public void addNewSubTask(SubTask subTask) {
         taskIdCounter++;
         subTask.setId(taskIdCounter);
         subTaskMap.put(subTask.getId(), subTask);
     }
 
-    public void update(Task task) {
+    public void updateTask(Task task) {
         if (simpleTaskMap.containsKey(task.getId())) {
             simpleTaskMap.put(task.getId(), task);
         }
     }
 
-    public void update(Epic epic) {
+    public void updateEpic(Epic epic) {
         if (epicMap.containsKey(epic.getId())) {
             epicMap.put(epic.getId(), epic);
         }
         updateEpicStatus(epic.getId());
     }
 
-    public void update(SubTask subTask) {
+    public void updateSubTask(SubTask subTask) {
         if (subTaskMap.containsKey(subTask.getId())) {
             Epic epic = epicMap.get(subTask.getEpicId());
             epic.addToSubTasksIdList(subTask.getId());
