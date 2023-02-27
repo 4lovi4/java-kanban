@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
-    private ArrayList<Integer> subTaskIdList;
+    protected ArrayList<Integer> subTaskIdList;
 
     public Epic() {
         super();
@@ -23,8 +23,8 @@ public class Epic extends Task {
         return subTaskIdList;
     }
 
-    public void addToSubTasksIdList(int subTaskid) {
-        subTaskIdList.add(subTaskid);
+    public void addToSubTasksIdList(int subTaskId) {
+        subTaskIdList.add(subTaskId);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class Epic extends Task {
         }
         return "Epic{" +
                 "name='" + name + '\'' +
-                ", description='" + description + '\'' +
+                ", description='" + printDescription + '\'' +
                 ", id=" + id +
                 ", subTaskList=" + subTaskIdList +
                 ", status=" + status +
