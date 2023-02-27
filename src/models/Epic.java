@@ -1,4 +1,4 @@
-package ru.yandex.practikum.sprint3.models;
+package models;
 
 import java.util.ArrayList;
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package ru.yandex.practikum.sprint3.models;
+package models;
 
 public enum Status {
     NEW,

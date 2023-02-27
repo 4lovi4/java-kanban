@@ -1,8 +1,8 @@
-import ru.yandex.practikum.sprint3.models.Epic;
-import ru.yandex.practikum.sprint3.models.Status;
-import ru.yandex.practikum.sprint3.models.SubTask;
-import ru.yandex.practikum.sprint3.models.Task;
-import ru.yandex.practikum.sprint3.manager.*;
+import models.Epic;
+import models.Status;
+import models.SubTask;
+import models.Task;
+import manager.*;
 
 import java.util.ArrayList;
 

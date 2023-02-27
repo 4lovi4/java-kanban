@@ -1,9 +1,9 @@
-package ru.yandex.practikum.sprint3.manager;
+package manager;
 
-import ru.yandex.practikum.sprint3.models.Epic;
-import ru.yandex.practikum.sprint3.models.Status;
-import ru.yandex.practikum.sprint3.models.SubTask;
-import ru.yandex.practikum.sprint3.models.Task;
+import models.Epic;
+import models.Status;
+import models.SubTask;
+import models.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
