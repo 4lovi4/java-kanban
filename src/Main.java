@@ -12,23 +12,23 @@ public class Main {
         TaskManager manager = new TaskManager();
 
         // Создание задач всех типов
-        Task task1 = new Task("Задача 1", "Простая задача", 0, Status.NEW);
-        Task task2 = new Task("Задача 2", "Задача уже делается", 0, Status.IN_PROGRESS);
-        Epic epic1 = new Epic("Эпик 1", "Первый эпик", 0, null);
-        Epic epic2 = new Epic("Эпик 2", "Второй эпик", 0, null);
-        SubTask subTask1 = new SubTask("Подзадача 1", "Подзадача из 1го эпика",
+        Task taskOne = new Task("Задача 1", "Простая задача", 0, Status.NEW);
+        Task taskTwo = new Task("Задача 2", "Задача уже делается", 0, Status.IN_PROGRESS);
+        Epic epicOne = new Epic("Эпик 1", "Первый эпик", 0, null);
+        Epic epicTwo = new Epic("Эпик 2", "Второй эпик", 0, null);
+        SubTask subTaskOne = new SubTask("Подзадача 1", "Подзадача из 1го эпика",
                 0, Status.NEW, 0);
-        SubTask subTask2 = new SubTask("Подзадача 2", "Подзадача из 1го эпика",
+        SubTask subTaskTwo = new SubTask("Подзадача 2", "Подзадача из 1го эпика",
                 0, Status.NEW, 0);
-        SubTask subTask3 = new SubTask("Подзадача 3", "Подзадача из 2го эпика",
+        SubTask subTaskThree = new SubTask("Подзадача 3", "Подзадача из 2го эпика",
                 0, Status.NEW, 0);
-        manager.create(task1);
-        manager.create(task2);
-        manager.create(epic1);
-        manager.create(epic2);
-        manager.create(subTask1);
-        manager.create(subTask2);
-        manager.create(subTask3);
+        manager.create(taskOne);
+        manager.create(taskTwo);
+        manager.create(epicOne);
+        manager.create(epicTwo);
+        manager.create(subTaskOne);
+        manager.create(subTaskTwo);
+        manager.create(subTaskThree);
         ArrayList<Task> allTasks = manager.getAllTasksList();
         ArrayList<Epic> allEpics = manager.getAllEpicsList();
         ArrayList<SubTask> allSubTasks = manager.getAllSubTasksList();
@@ -39,35 +39,35 @@ public class Main {
         System.out.println(allSubTasks);
 
         // Обновление созданных задач
-        task1 = allTasks.get(0);
-        task2 = allTasks.get(1);
-        task1.setStatus(Status.IN_PROGRESS);
-        manager.update(task1);
-        task2.setStatus(Status.DONE);
-        manager.update(task2);
+        taskOne = allTasks.get(0);
+        taskTwo = allTasks.get(1);
+        taskOne.setStatus(Status.IN_PROGRESS);
+        manager.update(taskOne);
+        taskTwo.setStatus(Status.DONE);
+        manager.update(taskTwo);
 
-        epic1 = allEpics.get(0);
-        epic2 = allEpics.get(1);
-        subTask1 = allSubTasks.get(0);
-        subTask2 = allSubTasks.get(1);
-        subTask3 = allSubTasks.get(2);
-        subTask1.setEpicId(epic1.getId());
-        subTask2.setEpicId(epic1.getId());
-        subTask3.setEpicId(epic2.getId());
-        subTask1.setStatus(Status.IN_PROGRESS);
-        subTask2.setStatus(Status.DONE);
-        subTask3.setStatus(Status.DONE);
-        epic1.addToSubTasksIdList(subTask1.getId());
-        epic1.addToSubTasksIdList(subTask2.getId());
-        epic2.addToSubTasksIdList(subTask3.getId());
-        manager.update(epic1);
-        manager.update(epic2);
-        manager.update(subTask1);
-        manager.update(subTask2);
-        manager.update(subTask3);
+        epicOne = allEpics.get(0);
+        epicTwo = allEpics.get(1);
+        subTaskOne = allSubTasks.get(0);
+        subTaskTwo = allSubTasks.get(1);
+        subTaskThree = allSubTasks.get(2);
+        subTaskOne.setEpicId(epicOne.getId());
+        subTaskTwo.setEpicId(epicOne.getId());
+        subTaskThree.setEpicId(epicTwo.getId());
+        subTaskOne.setStatus(Status.IN_PROGRESS);
+        subTaskTwo.setStatus(Status.DONE);
+        subTaskThree.setStatus(Status.DONE);
+        epicOne.addToSubTasksIdList(subTaskOne.getId());
+        epicOne.addToSubTasksIdList(subTaskTwo.getId());
+        epicTwo.addToSubTasksIdList(subTaskThree.getId());
+        manager.update(epicOne);
+        manager.update(epicTwo);
+        manager.update(subTaskOne);
+        manager.update(subTaskTwo);
+        manager.update(subTaskThree);
 
         //Удалим таску и эпик
-        manager.deleteTask(task1.getId());
-        manager.deleteEpic(epic2.getId());
+        manager.deleteTask(taskOne.getId());
+        manager.deleteEpic(epicTwo.getId());
     }
 }
