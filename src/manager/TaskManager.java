@@ -10,9 +10,9 @@ import java.util.HashMap;
 
 public class TaskManager {
     private int taskIdCounter;
-    private HashMap<Integer, Task> simpleTaskMap;
-    private HashMap<Integer, Epic> epicMap;
-    private HashMap<Integer, SubTask> subTaskMap;
+    private final HashMap<Integer, Task> simpleTaskMap;
+    private final HashMap<Integer, Epic> epicMap;
+    private final HashMap<Integer, SubTask> subTaskMap;
 
     public TaskManager() {
         taskIdCounter = 0;
@@ -23,10 +23,6 @@ public class TaskManager {
 
     public int getTaskIdCounter() {
         return taskIdCounter;
-    }
-
-    private void setTaskIdCounter(int taskIdCounter) {
-        this.taskIdCounter = taskIdCounter;
     }
 
     public ArrayList<Task> getAllTasksList() {
@@ -41,15 +37,15 @@ public class TaskManager {
         return new ArrayList<>(subTaskMap.values());
     }
 
-    public void clearAllTasks() {
+    public void deleteAllTasks() {
         simpleTaskMap.clear();
     }
 
-    public void clearAllEpics() {
+    public void deleteAllEpics() {
         epicMap.clear();
     }
 
-    public void clearAllSubTasks() {
+    public void deleteAllSubTasks() {
         subTaskMap.clear();
     }
 
@@ -65,24 +61,26 @@ public class TaskManager {
         return subTaskMap.get(id);
     }
 
-    public void addNewTask(Task task) {
+    public int addNewTask(Task task) {
         taskIdCounter++;
-        setTaskIdCounter(taskIdCounter);
         task.setId(taskIdCounter);
         simpleTaskMap.put(task.getId(), task);
+        return task.getId();
     }
 
-    public void addNewEpic(Epic epic) {
+    public int addNewEpic(Epic epic) {
         taskIdCounter++;
         epic.setId(taskIdCounter);
         updateEpicStatus(epic.getId());
         epicMap.put(epic.getId(), epic);
+        return epic.getId();
     }
 
-    public void addNewSubTask(SubTask subTask) {
+    public int addNewSubTask(SubTask subTask) {
         taskIdCounter++;
         subTask.setId(taskIdCounter);
         subTaskMap.put(subTask.getId(), subTask);
+        return subTask.getId();
     }
 
     public void updateTask(Task task) {
