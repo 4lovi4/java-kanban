@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+        InMemoryTaskManager manager = (InMemoryTaskManager) Managers.getDefault();
 
         // Создание задач всех типов
         Task taskOne = new Task("Задача 1", "Простая задача", 0, Status.NEW);
@@ -72,6 +72,8 @@ public class Main {
 
         //вызов getHistory
         manager.getEpic(3);
+        System.out.println(manager.getHistory());
+        manager.getSubTask(7);
         System.out.println(manager.getHistory());
     }
 }

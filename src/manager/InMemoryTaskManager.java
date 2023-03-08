@@ -14,17 +14,15 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> simpleTaskMap;
     private final HashMap<Integer, Epic> epicMap;
     private final HashMap<Integer, SubTask> subTaskMap;
-    private final ArrayList<Task> taskHistoryList;
-    private int taskHistoryCounter;
-    private final int TASK_HISTORY_SIZE = 10;
+    InMemoryHistoryManager historyManager;
+
 
     public InMemoryTaskManager() {
         taskIdCounter = 0;
         simpleTaskMap = new HashMap<>();
         epicMap = new HashMap<>();
         subTaskMap = new HashMap<>();
-        taskHistoryList = new ArrayList<>(TASK_HISTORY_SIZE);
-        taskHistoryCounter = 0;
+        historyManager = (InMemoryHistoryManager) Managers.getDefaultHistory();
     }
 
     @Override
@@ -66,8 +64,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTask(int id) {
         iterateTaskHistory(id);
         Task task = simpleTaskMap.get(id);
-        taskHistoryList.add(taskHistoryCounter, task);
-        taskHistoryCounter++;
+        historyManager.addTask(task);
         return simpleTaskMap.get(id);
     }
 
@@ -75,8 +72,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpic(int id) {
         iterateTaskHistory(id);
         Task task = epicMap.get(id);
-        taskHistoryList.add(taskHistoryCounter, task);
-        taskHistoryCounter++;
+        historyManager.addTask(task);
         return epicMap.get(id);
     }
 
@@ -84,8 +80,7 @@ public class InMemoryTaskManager implements TaskManager {
     public SubTask getSubTask(int id) {
         iterateTaskHistory(id);
         Task task = subTaskMap.get(id);
-        taskHistoryList.add(taskHistoryCounter, task);
-        taskHistoryCounter++;
+        historyManager.addTask(task);
         return subTaskMap.get(id);
     }
 
@@ -189,13 +184,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void iterateTaskHistory(int id) {
-        if (taskHistoryList.size() == TASK_HISTORY_SIZE) {
-            taskHistoryCounter = 0;
-        }
+
     }
 
     @Override
     public List<Task> getHistory() {
-        return taskHistoryList;
+        return historyManager.getHistory();
     }
 }
