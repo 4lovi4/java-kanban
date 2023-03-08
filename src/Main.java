@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        InMemoryTaskManager manager = new InMemoryTaskManager();
 
         // Создание задач всех типов
         Task taskOne = new Task("Задача 1", "Простая задача", 0, Status.NEW);
