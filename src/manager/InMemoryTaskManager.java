@@ -6,6 +6,7 @@ import models.SubTask;
 import models.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -13,12 +14,17 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> simpleTaskMap;
     private final HashMap<Integer, Epic> epicMap;
     private final HashMap<Integer, SubTask> subTaskMap;
+    private final ArrayList<Task> taskHistoryList;
+    private int taskHistoryCounter;
+    private final int TASK_HISTORY_SIZE = 10;
 
     public InMemoryTaskManager() {
         taskIdCounter = 0;
         simpleTaskMap = new HashMap<>();
         epicMap = new HashMap<>();
         subTaskMap = new HashMap<>();
+        taskHistoryList = new ArrayList<>(TASK_HISTORY_SIZE);
+        taskHistoryCounter = 0;
     }
 
     @Override
@@ -58,16 +64,28 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(int id) {
+        iterateTaskHistory(id);
+        Task task = simpleTaskMap.get(id);
+        taskHistoryList.add(taskHistoryCounter, task);
+        taskHistoryCounter++;
         return simpleTaskMap.get(id);
     }
 
     @Override
     public Epic getEpic(int id) {
+        iterateTaskHistory(id);
+        Task task = epicMap.get(id);
+        taskHistoryList.add(taskHistoryCounter, task);
+        taskHistoryCounter++;
         return epicMap.get(id);
     }
 
     @Override
     public SubTask getSubTask(int id) {
+        iterateTaskHistory(id);
+        Task task = subTaskMap.get(id);
+        taskHistoryList.add(taskHistoryCounter, task);
+        taskHistoryCounter++;
         return subTaskMap.get(id);
     }
 
@@ -145,14 +163,14 @@ public class InMemoryTaskManager implements TaskManager {
         ArrayList<Integer> epicSubTasksIdList = epic.getSubTasksIdList();
         if (epicSubTasksIdList.isEmpty()) return result;
         for (Integer subTaskId : epicSubTasksIdList) {
-            SubTask subTask = getSubTask(subTaskId);
+            SubTask subTask = subTaskMap.get(subTaskId);
             result.add(subTask);
         }
         return result;
     }
 
     private void updateEpicStatus(int id) {
-        Epic epic = getEpic(id);
+        Epic epic = epicMap.get(id);
         boolean isAllNew = true;
         boolean isAllDone = true;
         if (epic == null) return;
@@ -168,5 +186,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (isAllNew) epic.setStatus(Status.NEW);
         else if (isAllDone) epic.setStatus(Status.DONE);
         else epic.setStatus(Status.IN_PROGRESS);
+    }
+
+    private void iterateTaskHistory(int id) {
+        if (taskHistoryList.size() == TASK_HISTORY_SIZE) {
+            taskHistoryCounter = 0;
+        }
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return taskHistoryList;
     }
 }

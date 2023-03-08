@@ -1,6 +1,7 @@
 package manager;
 
 import java.util.ArrayList;
+import java.util.List;
 import models.Epic;
 import models.SubTask;
 import models.Task;
@@ -45,4 +46,6 @@ public interface TaskManager {
 	void deleteSubTask(int id);
 
 	ArrayList<SubTask> getSubTasksByEpic(int id);
+
+	List<Task> getHistory();
 }

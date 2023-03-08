@@ -69,5 +69,9 @@ public class Main {
         //Удалим таску и эпик
         manager.deleteTask(taskOne.getId());
         manager.deleteEpic(epicTwo.getId());
+
+        //вызов getHistory
+        manager.getEpic(3);
+        System.out.println(manager.getHistory());
     }
 }
