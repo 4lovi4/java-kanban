@@ -1,24 +1,22 @@
-package models;
+package tasks;
 
 import java.util.Objects;
 
 public class Task {
+    protected int id;
     protected String name;
     protected String description;
-    protected int id;
     protected Status status;
 
     public Task() {
         status = Status.NEW;
     }
 
-
-
-    public Task(String name, String description, int id, Status status) {
+    public Task(String name, String description, int id) {
         this.name = name;
         this.description = description;
         this.id = id;
-        this.status = status;
+        this.status = Status.NEW;
     }
 
     public String getName() {

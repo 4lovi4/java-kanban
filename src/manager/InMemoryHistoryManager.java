@@ -2,7 +2,7 @@ package manager;
 
 import java.util.ArrayList;
 import java.util.List;
-import models.Task;
+import tasks.Task;
 public class InMemoryHistoryManager implements HistoryManager{
 
 	private final ArrayList<Task> taskHistoryList;

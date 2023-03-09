@@ -1,7 +1,7 @@
 package manager;
 
 import java.util.List;
-import models.Task;
+import tasks.Task;
 
 public interface HistoryManager {
 	void addTask(Task task);

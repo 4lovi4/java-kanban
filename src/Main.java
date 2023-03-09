@@ -1,7 +1,7 @@
-import models.Epic;
-import models.Status;
-import models.SubTask;
-import models.Task;
+import tasks.Epic;
+import tasks.Status;
+import tasks.SubTask;
+import tasks.Task;
 import manager.*;
 
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ public class Main {
         InMemoryTaskManager manager = (InMemoryTaskManager) Managers.getDefault();
 
         // Создание задач всех типов
-        Task taskOne = new Task("Задача 1", "Простая задача", 0, Status.NEW);
-        Task taskTwo = new Task("Задача 2", "Задача уже делается", 0, Status.IN_PROGRESS);
+        Task taskOne = new Task("Задача 1", "Простая задача", 0);
+        Task taskTwo = new Task("Задача 2", "Задача уже делается", 0);
         Epic epicOne = new Epic("Эпик 1", "Первый эпик", 0, null);
         Epic epicTwo = new Epic("Эпик 2", "Второй эпик", 0, null);
         SubTask subTaskOne = new SubTask("Подзадача 1", "Подзадача из 1го эпика",

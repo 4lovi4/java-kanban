@@ -2,9 +2,9 @@ package manager;
 
 import java.util.ArrayList;
 import java.util.List;
-import models.Epic;
-import models.SubTask;
-import models.Task;
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
 
 public interface TaskManager {
 	int getTaskIdCounter();
