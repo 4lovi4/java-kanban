@@ -53,14 +53,10 @@ public class Task {
 
     @Override
     public String toString() {
-        String printDescription = "null";
-        if (description != null) {
-            printDescription = Integer.toString(description.length());
-        }
         return "Task{" +
-                "name='" + name + '\'' +
-                ", description='" + printDescription + '\'' +
-                ", id=" + id +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
     }
