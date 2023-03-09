@@ -7,7 +7,7 @@ public class InMemoryHistoryManager implements HistoryManager{
 
 	private final ArrayList<Task> taskHistoryList;
 	private int taskHistoryCounter;
-	private final int TASK_HISTORY_SIZE = 10;
+	private static final int TASK_HISTORY_SIZE = 10;
 
 	public InMemoryHistoryManager() {
 		taskHistoryList = new ArrayList<>(TASK_HISTORY_SIZE);
