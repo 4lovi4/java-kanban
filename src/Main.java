@@ -54,9 +54,9 @@ public class Main {
 		subTaskOne.setStatus(Status.IN_PROGRESS);
 		subTaskTwo.setStatus(Status.DONE);
 		subTaskThree.setStatus(Status.DONE);
-		epicOne.addToSubTasksIdList(subTaskOne.getId());
-		epicOne.addToSubTasksIdList(subTaskTwo.getId());
-		epicTwo.addToSubTasksIdList(subTaskThree.getId());
+		epicOne.addToSubTasksId(subTaskOne.getId());
+		epicOne.addToSubTasksId(subTaskTwo.getId());
+		epicTwo.addToSubTasksId(subTaskThree.getId());
 		manager.updateEpic(epicOne);
 		manager.updateEpic(epicTwo);
 		manager.updateSubTask(subTaskOne);

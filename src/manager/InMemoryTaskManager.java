@@ -16,7 +16,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, SubTask> subTasks;
     private final InMemoryHistoryManager historyManager;
 
-
     public InMemoryTaskManager() {
         taskIdCounter = 0;
         tasks = new HashMap<>();
@@ -53,6 +52,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         epics.clear();
+        subTasks.clear();
     }
 
     @Override
@@ -125,7 +125,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubTask(SubTask subTask) {
         if (subTasks.containsKey(subTask.getId())) {
             Epic epic = epics.get(subTask.getEpicId());
-            epic.addToSubTasksIdList(subTask.getId());
+            epic.addToSubTasksId(subTask.getId());
             subTasks.put(subTask.getId(), subTask);
             epics.put(epic.getId(), epic);
             updateEpicStatus(epic.getId());
