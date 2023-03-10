@@ -58,7 +58,7 @@ public class InMemoryTaskManager implements TaskManager {
 	@Override
 	public void deleteAllSubTasks() {
 		for (Epic epic : epics.values()) {
-			epic.getSubTasksIdList().clear();
+			epic.getSubTasksId().clear();
 			updateEpic(epic);
 		}
 		subTasks.clear();
@@ -112,7 +112,7 @@ public class InMemoryTaskManager implements TaskManager {
 		//Добавление сабтаски в эпик и обновление его статуса
 		int epicId = subTask.getEpicId();
 		Epic epic = epics.get(epicId);
-		if (epic != null && !epic.getSubTasksIdList().contains(subTask.getId())) {
+		if (epic != null && !epic.getSubTasksId().contains(subTask.getId())) {
 			epic.addToSubTasksId(subTask.getId());
 			updateEpicStatus(epic.getId());
 		}
@@ -139,7 +139,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public void updateSubTask(SubTask subTask) {
 		if (subTasks.containsKey(subTask.getId())) {
 			Epic epic = epics.get(subTask.getEpicId());
-			if (epic != null && !epic.getSubTasksIdList().contains(subTask.getId())) {
+			if (epic != null && !epic.getSubTasksId().contains(subTask.getId())) {
 				epic.addToSubTasksId(subTask.getId());
 				epics.put(epic.getId(), epic);
 				updateEpicStatus(epic.getId());
@@ -155,7 +155,14 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public void deleteEpic(int id) {
-		epics.remove(id);
+		Epic epic = epics.get(id);
+		if (epic != null) {
+			ArrayList<Integer> subTasksId = epic.getSubTasksId();
+			for (int idSubTask : subTasksId) {
+				subTasks.remove(subTasksId);
+			}
+			epics.remove(id);
+		}
 	}
 
 	@Override
@@ -168,7 +175,7 @@ public class InMemoryTaskManager implements TaskManager {
 		ArrayList<SubTask> result = new ArrayList<>();
 		Epic epic = epics.get(id);
 		if (epic == null) return result;
-		ArrayList<Integer> epicSubTasksIdList = epic.getSubTasksIdList();
+		ArrayList<Integer> epicSubTasksIdList = epic.getSubTasksId();
 		if (epicSubTasksIdList.isEmpty()) return result;
 		for (Integer subTaskId : epicSubTasksIdList) {
 			SubTask subTask = subTasks.get(subTaskId);
