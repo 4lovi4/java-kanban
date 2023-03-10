@@ -1,4 +1,4 @@
-package manager;
+package managers;
 
 import tasks.Epic;
 import tasks.Status;
@@ -64,21 +64,21 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTask(int id) {
         Task task = tasks.get(id);
         historyManager.addTask(task);
-        return tasks.get(id);
+        return task;
     }
 
     @Override
     public Epic getEpic(int id) {
-        Task task = epics.get(id);
+        Epic task = epics.get(id);
         historyManager.addTask(task);
-        return epics.get(id);
+        return task;
     }
 
     @Override
     public SubTask getSubTask(int id) {
-        Task task = subTasks.get(id);
+        SubTask task = subTasks.get(id);
         historyManager.addTask(task);
-        return subTasks.get(id);
+        return task;
     }
 
     @Override
