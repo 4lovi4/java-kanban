@@ -70,7 +70,7 @@ public class Main {
 		//вызов getHistory
 		manager.getEpic(3);
 		System.out.println(manager.getHistory());
-		manager.getSubTask(7);
+		manager.getSubTask(6);
 		System.out.println(manager.getHistory());
 	}
 }
