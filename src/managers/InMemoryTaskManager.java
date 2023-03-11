@@ -127,6 +127,11 @@ public class InMemoryTaskManager implements TaskManager {
 		if (epics.containsKey(epic.getId())) {
 			epics.put(epic.getId(), epic);
 		}
+		/*
+		Замечание в ревью: Этот метод вызываю после обновления эпика,
+		т.к. в новом эпипе могут быть сабтаски с новым статусами.
+		При вызове метода, происходит анализ сабтасок с Id из списка subTasksId.
+		*/
 		updateEpicStatus(epic.getId());
 	}
 
@@ -135,11 +140,17 @@ public class InMemoryTaskManager implements TaskManager {
 		if (subTasks.containsKey(subTask.getId())) {
 			Epic epic = epics.get(subTask.getEpicId());
 			if (epic != null && !epic.getSubTasksId().contains(subTask.getId())) {
+			/*
+			Замечание в ревью: Условие добавлено, чтобы не происходило каждый раз добавления Id
+			сабтаски в список subTasksId эпика, если она там уже есть.
+			Перенёс обновление статуса эпика updateEpicStatus из условия, чтобы обновление статуса
+			происходило после обновления сабтаски эпика.
+			 */
 				epic.addToSubTasksId(subTask.getId());
-				epics.put(epic.getId(), epic);
-				updateEpicStatus(epic.getId());
+				updateEpic(epic);
 			}
 			subTasks.put(subTask.getId(), subTask);
+			updateEpicStatus(epic.getId());
 		}
 	}
 
@@ -152,8 +163,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public void deleteEpic(int id) {
 		Epic epic = epics.get(id);
 		if (epic != null) {
-			ArrayList<Integer> subTasksId = epic.getSubTasksId();
-			for (int idSubTask : subTasksId) {
+			for (int idSubTask : epic.getSubTasksId()) {
 				subTasks.remove(idSubTask);
 			}
 			epics.remove(id);
@@ -166,6 +176,7 @@ public class InMemoryTaskManager implements TaskManager {
 		if (subTask != null) {
 			Epic epic = epics.get(subTask.getEpicId());
 			if (epic != null) {
+				//Приведение к Integer сделал в методе deleteFromSubTasksId
 				epic.deleteFromSubTasksId(id);
 				updateEpic(epic);
 			}
@@ -178,9 +189,9 @@ public class InMemoryTaskManager implements TaskManager {
 		ArrayList<SubTask> result = new ArrayList<>();
 		Epic epic = epics.get(id);
 		if (epic == null) return result;
-		ArrayList<Integer> epicSubTasksIdList = epic.getSubTasksId();
-		if (epicSubTasksIdList.isEmpty()) return result;
-		for (Integer subTaskId : epicSubTasksIdList) {
+		ArrayList<Integer> epicSubTasksId = epic.getSubTasksId();
+		if (epicSubTasksId.isEmpty()) return result;
+		for (Integer subTaskId : epicSubTasksId) {
 			SubTask subTask = subTasks.get(subTaskId);
 			result.add(subTask);
 		}
