@@ -25,11 +25,6 @@ public class InMemoryTaskManager implements TaskManager {
 	}
 
 	@Override
-	public int getTaskIdCounter() {
-		return taskIdCounter;
-	}
-
-	@Override
 	public ArrayList<Task> getAllTasksList() {
 		return new ArrayList<>(tasks.values());
 	}

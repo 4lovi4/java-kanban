@@ -7,8 +7,6 @@ import tasks.SubTask;
 import tasks.Task;
 
 public interface TaskManager {
-	int getTaskIdCounter();
-
 	ArrayList<Task> getAllTasksList();
 
 	ArrayList<Epic> getAllEpicsList();
