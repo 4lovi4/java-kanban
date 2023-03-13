@@ -54,7 +54,8 @@ public class InMemoryTaskManager implements TaskManager {
 	public void deleteAllSubTasks() {
 		for (Epic epic : epics.values()) {
 			epic.getSubTasksId().clear();
-			updateEpic(epic);
+			epics.put(epic.getId(), epic);
+			updateEpicStatus(epic.getId());
 		}
 		subTasks.clear();
 	}
@@ -127,31 +128,15 @@ public class InMemoryTaskManager implements TaskManager {
 		if (epics.containsKey(epic.getId())) {
 			epics.put(epic.getId(), epic);
 		}
-		/*
-		Замечание в ревью: Этот метод вызываю после обновления эпика,
-		т.к. в новом эпипе могут быть сабтаски с новым статусами.
-		При вызове метода, происходит анализ сабтасок с Id из списка subTasksId.
-		*/
-		updateEpicStatus(epic.getId());
 	}
 
 	@Override
 	public void updateSubTask(SubTask subTask) {
-		if (subTasks.containsKey(subTask.getId())) {
-			Epic epic = epics.get(subTask.getEpicId());
-			if (epic != null && !epic.getSubTasksId().contains(subTask.getId())) {
-			/*
-			Замечание в ревью: Условие добавлено, чтобы не происходило каждый раз добавления Id
-			сабтаски в список subTasksId эпика, если она там уже есть.
-			Перенёс обновление статуса эпика updateEpicStatus из условия, чтобы обновление статуса
-			происходило после обновления сабтаски эпика.
-			 */
-				epic.addToSubTasksId(subTask.getId());
-				updateEpic(epic);
-			}
-			subTasks.put(subTask.getId(), subTask);
-			updateEpicStatus(epic.getId());
-		}
+		if (subTasks.get(subTask.getId()) == null) return;
+		Epic epic = epics.get(subTask.getEpicId());
+		if (epic == null) return;
+		subTasks.put(subTask.getId(), subTask);
+		updateEpicStatus(epic.getId());
 	}
 
 	@Override
