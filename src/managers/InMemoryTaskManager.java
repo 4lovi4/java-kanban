@@ -177,7 +177,7 @@ public class InMemoryTaskManager implements TaskManager {
 			Epic epic = epics.get(subTask.getEpicId());
 			if (epic != null) {
 				//Приведение к Integer сделал в методе deleteFromSubTasksId
-				epic.deleteFromSubTasksId(id);
+				epic.deleteSubTaskId(id);
 				updateEpic(epic);
 			}
 		}
