@@ -7,11 +7,11 @@ import tasks.SubTask;
 import tasks.Task;
 
 public interface TaskManager {
-	ArrayList<Task> getAllTasksList();
+	ArrayList<Task> getAllTasks();
 
-	ArrayList<Epic> getAllEpicsList();
+	ArrayList<Epic> getAllEpics();
 
-	ArrayList<SubTask> getAllSubTasksList();
+	ArrayList<SubTask> getAllSubTasks();
 
 	void deleteAllTasks();
 

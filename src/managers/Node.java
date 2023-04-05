@@ -1,4 +1,4 @@
-package tasks;
+package managers;
 
 public class Node<T> {
     Node<T> prevNode;
