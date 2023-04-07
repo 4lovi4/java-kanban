@@ -7,11 +7,13 @@ import tasks.Task;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-	private final ArrayList<Task> taskHistory;
+	private final CustomLinkedList<Task> taskHistory;
 
 	public InMemoryHistoryManager() {
-		taskHistory = new ArrayList<>();
+		taskHistory = new CustomLinkedList<>();
 	}
+
+
 
 	@Override
 	public void addTask(Task task) {
@@ -25,7 +27,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
 	@Override
 	public List<Task> getHistory() {
-		return taskHistory;
+		return taskHistory.getTasks();
 	}
 
 	public class CustomLinkedList<T> extends LinkedList {
