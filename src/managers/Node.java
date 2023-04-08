@@ -1,5 +1,7 @@
 package managers;
 
+import java.util.Objects;
+
 public class Node<T> {
     Node<T> prevNode;
     Node<T> nextNode;
@@ -33,5 +35,18 @@ public class Node<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node<?> node = (Node<?>) o;
+        return Objects.equals(prevNode, node.prevNode) && Objects.equals(nextNode, node.nextNode) && Objects.equals(data, node.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(prevNode, nextNode, data);
     }
 }

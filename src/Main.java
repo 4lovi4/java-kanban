@@ -39,23 +39,33 @@ public class Main {
 		subTaskThree = allSubTasks.get(2);
 		subTaskOne.setEpicId(epicOne.getId());
 		subTaskTwo.setEpicId(epicOne.getId());
-		subTaskThree.setEpicId(epicTwo.getId());
+		subTaskThree.setEpicId(epicOne.getId());
 		subTaskOne.setStatus(Status.IN_PROGRESS);
 		subTaskTwo.setStatus(Status.DONE);
 		subTaskThree.setStatus(Status.DONE);
 		epicOne.addSubTaskId(subTaskOne.getId());
 		epicOne.addSubTaskId(subTaskTwo.getId());
-		epicTwo.addSubTaskId(subTaskThree.getId());
+		epicOne.addSubTaskId(subTaskThree.getId());
 		manager.updateEpic(epicOne);
 		manager.updateEpic(epicTwo);
 		manager.updateSubTask(subTaskOne);
 		manager.updateSubTask(subTaskTwo);
 		manager.updateSubTask(subTaskThree);
 
-		//вызов getHistory
-		manager.getEpic(3);
-		System.out.println(manager.getHistory());
-		manager.getSubTask(6);
-		System.out.println(manager.getHistory());
+		// Проверяем историю запросов задач
+		manager.getEpic(epicTwo.getId());
+		manager.getEpic(epicTwo.getId());
+		System.out.println("История запросов: " + manager.getHistory());
+		manager.getEpic(epicOne.getId());
+		manager.getSubTask(subTaskThree.getId());
+		manager.getSubTask(subTaskTwo.getId());
+		manager.getEpic(epicOne.getId());
+		manager.getEpic(epicTwo.getId());
+		manager.getSubTask(subTaskOne.getId());
+		System.out.println("История запросов: " + manager.getHistory());
+		manager.deleteSubTask(subTaskThree.getId());
+		System.out.println("История запросов: " + manager.getHistory());
+		manager.deleteEpic(epicOne.getId());
+		System.out.println("История запросов: " + manager.getHistory());
 	}
 }
