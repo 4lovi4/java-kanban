@@ -3,9 +3,9 @@ package managers;
 import java.util.Objects;
 
 public class Node<T> {
-    Node<T> prevNode;
-    Node<T> nextNode;
-    T data;
+    private Node<T> prevNode;
+    private Node<T> nextNode;
+    private T data;
 
     public Node(T data, Node<T> nextNode, Node<T> prevNode) {
         this.data = data;

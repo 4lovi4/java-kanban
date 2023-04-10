@@ -36,31 +36,43 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void remove(int id) {
         Node<Task> requestedNode = taskHistory.remove(id);
-        if (requestedNode != null)
+        if (requestedNode != null) {
             taskNodes.removeNode(requestedNode);
+        }
     }
 
+    /*
+    CustomLinkedList - класс внутри InMemoryHistoryManager,
+    так я понял ТЗ - мы не создаём отдельный файл для этого класса
+    Для класса CustomLinkedList создаётся объект taskNodes, поэтому не использую static
+    */
     public class CustomLinkedList<T> {
-        int size = 0;
-        Node<T> last;
-        Node<T> first;
+        /*
+        поле size хранит размер списка, изменяется при удалении добавлении ноды в список
+        при реализации ТЗ оно явно не используется, но мне кажется такое поле
+        */
+        private int size = 0;
+        private Node<T> last;
+        private Node<T> first;
 
         public void linkLast(T item) {
-            Node<T> l = last;
-            Node<T> newNode = new Node(item, null, l);
+            Node<T> lastNode = last;
+            Node<T> newNode = new Node(item, null, lastNode);
             last = newNode;
-            if (l == null) {
+            if (lastNode == null) {
                 first = newNode;
             } else {
-                l.setNextNode(newNode);
+                lastNode.setNextNode(newNode);
             }
             size++;
         }
 
         public List<T> getTasks() {
             List<T> tasks = new ArrayList<>();
-            for (Node<T> t = first; t != null; t = t.getNextNode()) {
-                tasks.add(t.getData());
+            Node<T> currentNode = first;
+            while (currentNode != null) {
+                tasks.add(currentNode.getData());
+                currentNode = currentNode.getNextNode();
             }
             return tasks;
         }
@@ -74,14 +86,26 @@ public class InMemoryHistoryManager implements HistoryManager {
             } else if (next == null && prev == null) {
                 first = null;
                 last = null;
-            } else if (next == null) {
+            } else if (next == null && prev != null) {
                 prev.setNextNode(null);
                 last = prev;
-            } else if (prev == null) {
+            } else if (prev == null && next != null) {
                 next.setPrevNode(null);
                 first = next;
             }
             size--;
+        }
+        // Добавил getter для полей списка, т.к. сделал их приватными
+        public int getSize() {
+            return size;
+        }
+
+        public Node<T> getLast() {
+            return last;
+        }
+
+        public Node<T> getFirst() {
+            return first;
         }
     }
 }
