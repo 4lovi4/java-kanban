@@ -12,11 +12,11 @@ public class Main {
 		InMemoryTaskManager manager = (InMemoryTaskManager) Managers.getDefault();
 
 		// Создание эпиков и подзадач
-		Epic epicOne = new Epic("Эпик 1", "Первый эпик", 0);
-		Epic epicTwo = new Epic("Эпик 2", "Второй эпик", 0);
-		SubTask subTaskOne = new SubTask("Подзадача 1", "Подзадача из 1го эпика", 0, 0);
-		SubTask subTaskTwo = new SubTask("Подзадача 2", "Подзадача из 1го эпика", 0, 0);
-		SubTask subTaskThree = new SubTask("Подзадача 3", "Подзадача из 2го эпика", 0, 0);
+		Epic epicOne = new Epic(0,"Эпик 1", "Первый эпик");
+		Epic epicTwo = new Epic(0, "Эпик 2", "Второй эпик");
+		SubTask subTaskOne = new SubTask(0, "Подзадача 1", "Подзадача из 1го эпика", 0);
+		SubTask subTaskTwo = new SubTask(0, "Подзадача 2", "Подзадача из 1го эпика", 0);
+		SubTask subTaskThree = new SubTask(0, "Подзадача 3", "Подзадача из 2го эпика", 0);
 
 		manager.addNewEpic(epicOne);
 		manager.addNewEpic(epicTwo);

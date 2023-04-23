@@ -5,15 +5,15 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
-    protected final ArrayList<Integer> subTasksId;
+    protected ArrayList<Integer> subTasksId;
 
     public Epic() {
         super();
         subTasksId = new ArrayList<>();
     }
 
-    public Epic(String name, String description, int id) {
-        super(name, description, id);
+    public Epic(int id, String name, String description) {
+        super(id, name, description);
         this.subTasksId = new ArrayList<>();
     }
 
