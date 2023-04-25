@@ -15,14 +15,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     String toString(Task task) {
-        TaskType taskType;
-        if (task instanceof Task) {
-            taskType = TaskType.TASK;
-        }
-        else if (task instanceof Epic) {
+        TaskType taskType = TaskType.TASK;
+        if (task instanceof Epic) {
             taskType = TaskType.EPIC;
         }
-        return task.getId() + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription() + "," + "";
+        return task.getId() + "," + taskType + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription() + "," + "";
     }
 
     String toString(SubTask subTask) {
@@ -34,5 +31,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         String[] taskFields = taskValue.split(",");
 
         return new Task();
+    }
+
+    public static void main(String[] args) {
+        FileBackedTasksManager manager = new FileBackedTasksManager();
+        Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
+        Epic epic = new Epic(2, "Эпик 1", "NEW", "описание эпика");
+        SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
+        System.out.println(manager.toString(subTask));
     }
 }
