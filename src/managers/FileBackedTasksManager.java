@@ -11,6 +11,13 @@ import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
 
+    private String filename;
+
+    public FileBackedTasksManager(String filename) {
+        super();
+        this.filename = filename;
+    }
+
     public void save() {
     }
 
@@ -34,7 +41,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     public static void main(String[] args) {
-        FileBackedTasksManager manager = new FileBackedTasksManager();
+        FileBackedTasksManager manager = new FileBackedTasksManager("saved_tasks.csv");
         Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
         Epic epic = new Epic(2, "Эпик 1", "NEW", "описание эпика");
         SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
