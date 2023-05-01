@@ -5,20 +5,39 @@ import tasks.SubTask;
 import tasks.Task;
 import tasks.TaskType;
 
+import java.io.*;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
 
-    private String filename;
+    private File storageFile;
+    private final String STORAGE_HEADER = "id,type,name,status,description,epic\n";
 
-    public FileBackedTasksManager(String filename) {
+    public FileBackedTasksManager(String filename) throws IOException {
         super();
-        this.filename = filename;
+        this.storageFile = new File(filename);
+        if (storageFile.createNewFile()) {
+            System.out.println("Создан новый файл: " + storageFile.getAbsolutePath());
+        }
+        Writer taskWriter = null;
+        try {
+            taskWriter = new FileWriter(storageFile, false);
+            taskWriter.write(STORAGE_HEADER);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (taskWriter != null) {
+                taskWriter.close();
+            }
+        }
     }
 
     public void save() {
+
+
     }
 
     String toString(Task task) {
@@ -71,13 +90,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     static List<Integer> historyFromString(String historyLine) {
         ArrayList<Integer> history = new ArrayList<>();
         for (String id: historyLine.split(",")) {
-            history.add(Integer.valueOf(id))
+            history.add(Integer.valueOf(id));
         }
         return history;
     }
 
     public static void main(String[] args) {
-        FileBackedTasksManager manager = new FileBackedTasksManager("saved_tasks.csv");
+        FileBackedTasksManager manager;
+        try {
+            manager = new FileBackedTasksManager("saved_tasks.csv");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
         Epic epic = new Epic(2, "Эпик 1", "NEW", "описание эпика");
         SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
@@ -85,7 +109,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         System.out.println(manager.toString(epic));
         System.out.println(manager.toString(subTask));
     }
-};
+}
 
 class TaskFormatException extends RuntimeException {
     public TaskFormatException(String errorMessage, Throwable error) {
