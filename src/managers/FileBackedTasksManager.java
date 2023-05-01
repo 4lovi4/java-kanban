@@ -14,30 +14,113 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     private File storageFile;
     private final String STORAGE_HEADER = "id,type,name,status,description,epic\n";
 
-    public FileBackedTasksManager(String filename) throws IOException {
+    public FileBackedTasksManager(File file) {
         super();
-        this.storageFile = new File(filename);
-        if (storageFile.createNewFile()) {
-            System.out.println("Создан новый файл: " + storageFile.getAbsolutePath());
+        this.storageFile = file;
+        try {
+            if (storageFile.createNewFile()) {
+                System.out.println("Создан новый файл: " + storageFile.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public int addNewTask(Task task) {
+        int taskId = super.addNewTask(task);
+        save();
+        return taskId;
+    }
+
+    @Override
+    public int addNewEpic(Epic epic) {
+        int epicId = super.addNewEpic(epic);
+        save();
+        return epicId;
+    }
+
+    @Override
+    public int addNewSubTask(SubTask subTask) {
+        int subTaskId = super.addNewSubTask(subTask);
+        save();
+        return subTaskId;
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save();
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
+        save();
+    }
+
+    @Override
+    public void updateSubTask(SubTask subTask) {
+        super.updateSubTask(subTask);
+        save();
+    }
+
+    @Override
+    public void deleteTask(int id) {
+        super.deleteTask(id);
+        save();
+    }
+
+    @Override
+    public void deleteEpic(int id) {
+        super.deleteEpic(id);
+        save();
+    }
+
+    @Override
+    public void deleteSubTask(int id) {
+        super.deleteSubTask(id);
+        save();
+    }
+
+    public void save() throws ManagerSaveException {
         Writer taskWriter = null;
+        List<Task> allTasks = getAllTasks();
+        List<Epic> allEpics = getAllEpics();
+        List<SubTask> allSubTasks = getAllSubTasks();
         try {
             taskWriter = new FileWriter(storageFile, false);
             taskWriter.write(STORAGE_HEADER);
+            for (Task task: allTasks) {
+                taskWriter.write(toString(task) + "\n");
+            }
+            for (Epic epic: allEpics) {
+                taskWriter.write(toString(epic) + "\n");
+            }
+            for (SubTask subTask: allSubTasks) {
+                taskWriter.write(toString(subTask) + "\n");
+            }
+            String historyLine = historyToString(this.historyManager);
+            taskWriter.write("\n" + historyLine);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            throw new ManagerSaveException("Ошибка сохранения списка задач в файл!", e);
         }
         finally {
             if (taskWriter != null) {
-                taskWriter.close();
+                try {
+                    taskWriter.close();
+                } catch (IOException e) {
+                    throw new ManagerSaveException("Ошибка сохранения списка задач в файл!", e);
+                }
             }
         }
     }
 
-    public void save() {
+    public static FileBackedTasksManager loadFromFile(File file) {
+        FileBackedTasksManager manager = new FileBackedTasksManager(file);
 
-
+        return manager;
     }
 
     String toString(Task task) {
@@ -96,12 +179,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     public static void main(String[] args) {
-        FileBackedTasksManager manager;
-        try {
-            manager = new FileBackedTasksManager("saved_tasks.csv");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final String FILENAME = "saved_tasks.csv";
+        FileBackedTasksManager manager = new FileBackedTasksManager(new File(FILENAME));
         Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
         Epic epic = new Epic(2, "Эпик 1", "NEW", "описание эпика");
         SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
@@ -116,4 +195,11 @@ class TaskFormatException extends RuntimeException {
         super(errorMessage, error);
     }
 }
+
+class ManagerSaveException extends RuntimeException {
+    public ManagerSaveException(String errorMessage, Throwable error) {
+        super(errorMessage, error);
+    }
+}
+
 

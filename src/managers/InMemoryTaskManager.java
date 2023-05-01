@@ -14,7 +14,7 @@ public class InMemoryTaskManager implements TaskManager {
 	private final HashMap<Integer, Task> tasks;
 	private final HashMap<Integer, Epic> epics;
 	private final HashMap<Integer, SubTask> subTasks;
-	private final InMemoryHistoryManager historyManager;
+	protected final InMemoryHistoryManager historyManager;
 
 	public InMemoryTaskManager() {
 		taskIdCounter = 0;
@@ -112,7 +112,6 @@ public class InMemoryTaskManager implements TaskManager {
 			epic.addSubTaskId(subTask.getId());
 			updateEpicStatus(epic.getId());
 		}
-
 		return subTask.getId();
 	}
 
