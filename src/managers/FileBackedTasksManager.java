@@ -58,6 +58,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return result;
     }
 
+    static String historyToString(HistoryManager manager) {
+        StringBuilder historyLine = new StringBuilder();
+        List<Task> history = manager.getHistory();
+        for (Task task: history) {
+            historyLine.append(Integer.toString(task.getId()) + ",");
+        }
+        historyLine.deleteCharAt(historyLine.length() - 1);
+        return historyLine.toString();
+    }
+
+    static List<Integer> historyFromString(String historyLine) {
+        ArrayList<Integer> history = new ArrayList<>();
+        for (String id: historyLine.split(",")) {
+            history.add(Integer.valueOf(id))
+        }
+        return history;
+    }
+
     public static void main(String[] args) {
         FileBackedTasksManager manager = new FileBackedTasksManager("saved_tasks.csv");
         Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
