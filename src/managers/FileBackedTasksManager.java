@@ -34,10 +34,28 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 + "," + subTask.getEpicId();
     }
 
-    Task fromString(String taskValue) {
+    Task fromString(String taskValue) throws TaskFormatException{
         String[] taskFields = taskValue.split(",");
-
-        return new Task();
+        Task result = new Task();
+        try {
+            TaskType taskType = TaskType.valueOf(taskFields[1]);
+            switch (taskType) {
+                case EPIC:
+                    result = new Epic(Integer.valueOf(taskFields[0]), taskFields[2], taskFields[3], taskFields[4]);
+                    break;
+                case TASK:
+                    result = new Task(Integer.valueOf(taskFields[0]), taskFields[2], taskFields[3], taskFields[4]);
+                    break;
+                case SUBTASK:
+                    result = new SubTask(Integer.valueOf(taskFields[0]), taskFields[2], taskFields[3], taskFields[4], Integer.valueOf(taskFields[5]));
+                    break;
+            }
+        }
+        catch (IndexOutOfBoundsException | IllegalArgumentException e) {
+            System.out.println();
+            throw new TaskFormatException("Неверный формат сохранения задачи: " + taskValue, e);
+        }
+        return result;
     }
 
     public static void main(String[] args) {
@@ -45,6 +63,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
         Epic epic = new Epic(2, "Эпик 1", "NEW", "описание эпика");
         SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
+        System.out.println(manager.toString(task));
+        System.out.println(manager.toString(epic));
         System.out.println(manager.toString(subTask));
     }
+};
+
+class TaskFormatException extends RuntimeException {
+    public TaskFormatException(String errorMessage, Throwable error) {
+        super(errorMessage, error);
+    }
 }
+
