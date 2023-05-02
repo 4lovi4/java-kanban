@@ -6,6 +6,8 @@ import tasks.Task;
 import tasks.TaskType;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +121,27 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     public static FileBackedTasksManager loadFromFile(File file) {
         FileBackedTasksManager manager = new FileBackedTasksManager(file);
-
+        String content = "";
+        try {
+            content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String[] contentLines = content.split("\n");
+        for (int i = 1; i < contentLines.length - 2; i++) {
+            Task task = manager.fromString(contentLines[i]);
+            if (task instanceof Epic) {
+                manager.addNewEpic((Epic) task);
+            }
+            else if (task instanceof SubTask) {
+                manager.addNewSubTask((SubTask) task);
+            }
+            else {
+                manager.addNewTask(task);
+            }
+            String historyLine = contentLines[contentLines.length - 1];
+            List<Integer> history = historyFromString(historyLine);
+        }
         return manager;
     }
 
@@ -163,8 +185,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     static String historyToString(HistoryManager manager) {
         StringBuilder historyLine = new StringBuilder();
         List<Task> history = manager.getHistory();
+        if (history.size() == 0) {
+            return "";
+        }
         for (Task task: history) {
-            historyLine.append(Integer.toString(task.getId()) + ",");
+            historyLine.append(task.getId() + ",");
         }
         historyLine.deleteCharAt(historyLine.length() - 1);
         return historyLine.toString();
@@ -182,11 +207,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         final String FILENAME = "saved_tasks.csv";
         FileBackedTasksManager manager = new FileBackedTasksManager(new File(FILENAME));
         Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
-        Epic epic = new Epic(2, "Эпик 1", "NEW", "описание эпика");
+        Epic epic = new Epic(2, "Эпик 1000", "NEW", "описание эпика");
         SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
-        System.out.println(manager.toString(task));
-        System.out.println(manager.toString(epic));
-        System.out.println(manager.toString(subTask));
+        manager.addNewTask(task);
+        int subTaskId = manager.addNewSubTask(subTask);
+        int epicId = manager.addNewEpic(epic);
+        epic.setId(epicId);
+        epic.addSubTaskId(subTaskId);
+        manager.updateEpic(epic);
     }
 }
 

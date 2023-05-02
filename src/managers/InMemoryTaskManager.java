@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
+	public void setTaskIdCounter(int taskIdCounter) {
+		this.taskIdCounter = taskIdCounter;
+	}
+
 	private int taskIdCounter;
 	private final HashMap<Integer, Task> tasks;
 	private final HashMap<Integer, Epic> epics;

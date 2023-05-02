@@ -25,3 +25,6 @@ hs_err_pid*
 #Ignore .idea files
 /.idea/
 /*.iml
+
+#data files
+*.csv
