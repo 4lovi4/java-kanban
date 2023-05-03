@@ -4,6 +4,8 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 import tasks.TaskType;
+import exception.TaskFormatException;
+import exception.ManagerSaveException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +13,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private File storageFile;
     private final String STORAGE_HEADER = "id,type,name,status,description,epic\n";
@@ -19,13 +21,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public FileBackedTasksManager(File file) {
         super();
         this.storageFile = file;
+    }
+
+    public void initializeFile() {
         if (this.storageFile.exists()) {
             try {
                 if (storageFile.createNewFile()) {
                     System.out.println("Создан новый файл: " + storageFile.getAbsolutePath());
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ManagerSaveException("Ошибка создания файла " + this.storageFile.getName(), e);
             }
         }
     }
@@ -235,8 +240,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     public static void main(String[] args) {
-        final String FILENAME = "saved_tasks.csv";
-        FileBackedTasksManager manager = new FileBackedTasksManager(new File(FILENAME));
+        final String filename = "saved_tasks.csv";
+        FileBackedTasksManager manager = new FileBackedTasksManager(new File(filename));
+        manager.initializeFile();
         Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
         Epic epic = new Epic(2, "Эпик 1000", "NEW", "описание эпика");
         SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
@@ -248,23 +254,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         manager.updateEpic(epic);
         manager.getTask(taskId);
         manager.getSubTask(subTaskId);
-        FileBackedTasksManager manager1 = FileBackedTasksManager.loadFromFile(new File(FILENAME));
+        FileBackedTasksManager manager1 = FileBackedTasksManager.loadFromFile(new File(filename));
         System.out.println(manager1.getAllTasks());
         System.out.println(manager1.getAllEpics());
         System.out.println(manager1.getAllSubTasks());
         System.out.println(manager1.getHistory());
-    }
-}
-
-class TaskFormatException extends RuntimeException {
-    public TaskFormatException(String errorMessage, Throwable error) {
-        super(errorMessage, error);
-    }
-}
-
-class ManagerSaveException extends RuntimeException {
-    public ManagerSaveException(String errorMessage, Throwable error) {
-        super(errorMessage, error);
     }
 }
 
