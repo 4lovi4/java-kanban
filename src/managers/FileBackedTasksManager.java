@@ -114,12 +114,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public void save() throws ManagerSaveException {
-        Writer taskWriter = null;
         List<Task> allTasks = getAllTasks();
         List<Epic> allEpics = getAllEpics();
         List<SubTask> allSubTasks = getAllSubTasks();
-        try {
-            taskWriter = new FileWriter(storageFile, false);
+        try (FileWriter taskWriter = new FileWriter(storageFile, false)) {
             taskWriter.write(STORAGE_HEADER);
             for (Task task : allTasks) {
                 taskWriter.write(toString(task) + "\n");
@@ -134,14 +132,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             taskWriter.write("\n" + historyLine);
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения списка задач в файл!", e);
-        } finally {
-            if (taskWriter != null) {
-                try {
-                    taskWriter.close();
-                } catch (IOException e) {
-                    throw new ManagerSaveException("Ошибка сохранения списка задач в файл!", e);
-                }
-            }
         }
     }
 
@@ -151,10 +141,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         try {
             content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ManagerSaveException("Ошибка чтения из файла " + file.getName(), e);
         }
         String[] contentLines = content.split("\n");
-        for (int i = 1; i < contentLines.length - 2; i++) {
+        for (int i = 1; !contentLines[i].equals(""); ++i) {
             Task task = manager.fromString(contentLines[i]);
             int taskId = task.getId();
             manager.setTaskIdCounter(taskId + 1);
@@ -182,7 +172,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return manager;
     }
 
-    String toString(Task task) {
+    private String toString(Task task) {
         TaskType taskType = TaskType.TASK;
         if (task instanceof Epic) {
             taskType = TaskType.EPIC;
@@ -190,12 +180,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return task.getId() + "," + taskType + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription() + "," + "";
     }
 
-    String toString(SubTask subTask) {
+    private String toString(SubTask subTask) {
         return subTask.getId() + "," + TaskType.SUBTASK + "," + subTask.getName() + "," + subTask.getStatus() + "," + subTask.getDescription()
                 + "," + subTask.getEpicId();
     }
 
-    Task fromString(String taskValue) throws TaskFormatException {
+    private Task fromString(String taskValue) throws TaskFormatException {
         String[] taskFields = taskValue.split(",");
         Task result = new Task();
         try {
@@ -211,18 +201,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     result = new SubTask(Integer.valueOf(taskFields[0]), taskFields[2], taskFields[3], taskFields[4], Integer.valueOf(taskFields[5]));
                     break;
             }
-        } catch (IndexOutOfBoundsException | IllegalArgumentException e) {
-            System.out.println();
+        } catch (IndexOutOfBoundsException e) {
+            throw new TaskFormatException("Неверный формат сохранения задачи: " + taskValue, e);
+        } catch (IllegalArgumentException e) {
             throw new TaskFormatException("Неверный формат сохранения задачи: " + taskValue, e);
         }
         return result;
     }
 
-    static String historyToString(HistoryManager manager) {
+    public static String historyToString(HistoryManager manager) {
         StringBuilder historyLine = new StringBuilder();
         List<Task> history = manager.getHistory();
+        String emptyLine = "";
         if (history.size() == 0) {
-            return "";
+            return emptyLine;
         }
         for (Task task : history) {
             historyLine.append(task.getId() + ",");
@@ -231,7 +223,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return historyLine.toString();
     }
 
-    static List<Integer> historyFromString(String historyLine) {
+    public static List<Integer> historyFromString(String historyLine) {
         ArrayList<Integer> history = new ArrayList<>();
         for (String id : historyLine.split(",")) {
             history.add(Integer.valueOf(id));
@@ -243,9 +235,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         final String filename = "saved_tasks.csv";
         FileBackedTasksManager manager = new FileBackedTasksManager(new File(filename));
         manager.initializeFile();
-        Task task = new Task(1, "Задача 1", "NEW", "описание задачи");
-        Epic epic = new Epic(2, "Эпик 1000", "NEW", "описание эпика");
-        SubTask subTask = new SubTask(3, "Эпик 1", "NEW", "описание подзадачи", 2);
+        Task task = new Task(10, "Задача 100", "NEW", "описание задачи");
+        Epic epic = new Epic(20, "Эпик 1000", "NEW", "описание эпика");
+        SubTask subTask = new SubTask(30, "Эпик 1", "NEW", "описание подзадачи", 2);
         int taskId = manager.addNewTask(task);
         int subTaskId = manager.addNewSubTask(subTask);
         int epicId = manager.addNewEpic(epic);
