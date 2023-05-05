@@ -184,39 +184,39 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         if (task instanceof Epic) {
             taskType = TaskType.EPIC;
         }
-        return task.getId() + "," + taskType + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription() + "," + "";
+        return String.format("%d,%s,%s,%s,%s,",task.getId(), taskType, task.getName(), task.getStatus(), task.getDescription());
     }
 
     private String toString(SubTask subTask) {
-        return subTask.getId() + "," + TaskType.SUBTASK + "," + subTask.getName() + "," + subTask.getStatus() + "," + subTask.getDescription()
-                + "," + subTask.getEpicId();
+        return String.format("%d,%s,%s,%s,%s,%d", subTask.getId(), TaskType.SUBTASK, subTask.getName(),
+                subTask.getStatus(), subTask.getDescription(), subTask.getEpicId());
     }
 
     private Task fromString(String taskValue) throws TaskFormatException {
         String[] taskFields = taskValue.split(",");
-        Task result = new Task();
+        Task result;
 
         try {
             TaskType taskType = TaskType.valueOf(taskFields[1]);
 
             switch (taskType) {
                 case EPIC:
-                    result = new Epic(Integer.valueOf(taskFields[0]), taskFields[2], taskFields[3], taskFields[4]);
+                    result = new Epic(Integer.parseInt(taskFields[0]), taskFields[2], taskFields[3], taskFields[4]);
                     break;
                 case TASK:
-                    result = new Task(Integer.valueOf(taskFields[0]), taskFields[2], taskFields[3], taskFields[4]);
+                    result = new Task(Integer.parseInt(taskFields[0]), taskFields[2], taskFields[3], taskFields[4]);
                     break;
                 case SUBTASK:
-                    result = new SubTask(Integer.valueOf(taskFields[0]), taskFields[2], taskFields[3], taskFields[4], Integer.valueOf(taskFields[5]));
+                    result = new SubTask(Integer.parseInt(taskFields[0]), taskFields[2], taskFields[3], taskFields[4], Integer.parseInt(taskFields[5]));
                     break;
                 default:
                     result = new Task();
                     break;
             }
         } catch (IndexOutOfBoundsException e) {
-            throw new TaskFormatException("Неверный формат сохранения задачи: " + taskValue, e);
+            throw new TaskFormatException("Число полей в сохранённой строке не соответствует ожидаемому: " + taskValue, e);
         } catch (IllegalArgumentException e) {
-            throw new TaskFormatException("Неверный формат сохранения задачи: " + taskValue, e);
+            throw new TaskFormatException("Неверный формат данных в сохранённой строке: " + taskValue, e);
         }
         return result;
     }
@@ -225,11 +225,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         StringBuilder historyLine = new StringBuilder();
         List<Task> history = manager.getHistory();
         String emptyLine = "";
-        if (history.size() == 0) {
+        if (history.isEmpty()) {
             return emptyLine;
         }
         for (Task task : history) {
-            historyLine.append(task.getId() + ",");
+            historyLine.append(task.getId()).append(",");
         }
         historyLine.deleteCharAt(historyLine.length() - 1);
         return historyLine.toString();
