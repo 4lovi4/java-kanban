@@ -42,11 +42,50 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic epic = createNewEpic();
         int epicId = taskManager.addNewEpic(epic);
         SubTask subTask1 = createSubTask(0, epicId);
-        SubTask subTask2 = createSubTask(0, epicId);
+        SubTask subTask2 = createSubTask(1, epicId);
         taskManager.addNewSubTask(subTask1);
         taskManager.addNewSubTask(subTask2);
         assertEquals(Status.NEW, subTask1.getStatus());
         assertEquals(Status.NEW, subTask2.getStatus());
         assertEquals(Status.NEW, epic.getStatus(), String.format("Статус эпика со всеми подзадачами в статусе %s не равен %s", Status.NEW, Status.NEW));
+    }
+
+    @Test
+    public void shouldReturnEpicDoneStatusForAllDoneSubTasks() {
+        Epic epic = createNewEpic();
+        int epicId = taskManager.addNewEpic(epic);
+        SubTask subTask1 = createSubTask(0, epicId);
+        subTask1.setStatus(Status.DONE);
+        SubTask subTask2 = createSubTask(1, epicId);
+        subTask2.setStatus(Status.DONE);
+        taskManager.addNewSubTask(subTask1);
+        taskManager.addNewSubTask(subTask2);
+        assertEquals(Status.DONE, epic.getStatus(), String.format("Статус эпика со всеми подзадачами в статусе %s не равен %s", Status.DONE, Status.DONE));
+    }
+
+    @Test
+    public void shouldReturnEpicInProgressStatusForDoneAndNewSubTasks() {
+        Epic epic = createNewEpic();
+        int epicId = taskManager.addNewEpic(epic);
+        SubTask subTask1 = createSubTask(0, epicId);
+        subTask1.setStatus(Status.NEW);
+        SubTask subTask2 = createSubTask(1, epicId);
+        subTask2.setStatus(Status.DONE);
+        taskManager.addNewSubTask(subTask1);
+        taskManager.addNewSubTask(subTask2);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus(), String.format("Статус эпика с подзадачами в статусе %s и %s не равен %s", Status.NEW, Status.DONE, Status.IN_PROGRESS));
+    }
+
+    @Test
+    public void shouldReturnEpicInProgressStatusForAllInProgressSubTasks() {
+        Epic epic = createNewEpic();
+        int epicId = taskManager.addNewEpic(epic);
+        SubTask subTask1 = createSubTask(0, epicId);
+        subTask1.setStatus(Status.IN_PROGRESS);
+        SubTask subTask2 = createSubTask(1, epicId);
+        subTask2.setStatus(Status.IN_PROGRESS);
+        taskManager.addNewSubTask(subTask1);
+        taskManager.addNewSubTask(subTask2);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus(), String.format("Статус эпика со всеми подзадачами в статусе %s не равен %s", Status.IN_PROGRESS, Status.IN_PROGRESS));
     }
 }
