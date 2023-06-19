@@ -1,6 +1,7 @@
 package managers;
 
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
@@ -156,6 +157,81 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		List<SubTask> allSubTasks = taskManager.getAllSubTasks();
 		assertNotNull(allSubTasks);
 		assertTrue(allSubTasks.isEmpty(), "Список всех подзадач не пустой");
+	}
+
+	@Test
+	public void shouldAddAndGetNewTask() {
+		Task task = createNewTask(1);
+		int taskId = taskManager.addNewTask(task);
+		task.setId(taskId);
+		Task taskAdded = taskManager.getTask(taskId);
+		assertNotNull(taskAdded);
+		assertEquals(task, taskAdded, "Добавленная задача не равна ожидаемой");
+	}
+
+	@Test
+	public void shouldAddAndGetNewEpic() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		epic.setId(epicId);
+		Epic epicAdded = taskManager.getEpic(epicId);
+		assertNotNull(epicAdded);
+		assertEquals(epic, epicAdded, "Добавленный эпик не равен ожидаемому");
+	}
+
+	@Test
+	public void shouldAddAndGetNewSubTask() {
+		SubTask subTask = createSubTask(1, 0);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		subTask.setId(subTaskId);
+		SubTask subTaskAdded = taskManager.getSubTask(subTaskId);
+		assertNotNull(subTaskAdded);
+		assertEquals(subTask, subTaskAdded, "Добавленная задача не равна ожидаемой");
+	}
+
+	@Test
+	public void shouldUpdateTask() {
+		Task task = createNewTask(1);
+		int taskId = taskManager.addNewTask(task);
+		task.setId(taskId);
+		task.setName("Измененная задач");
+		task.setStatus(Status.IN_PROGRESS);
+		task.setDescription("Новое описание задачи");
+		taskManager.updateTask(task);
+		Task taskUpdated = taskManager.getTask(taskId);
+		assertNotNull(taskUpdated);
+		assertEquals(task, taskUpdated, "Изменённая задача не равна ожидаемой");
+	}
+
+	@Test
+	public void shouldUpdateSubTask() {
+		SubTask subTask = createSubTask(1, 0);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		subTask.setId(subTaskId);
+		subTask.setName("Измененная подзадача");
+		subTask.setStatus(Status.DONE);
+		subTask.setDescription("Новое описание подзадачи");
+		taskManager.updateTask(subTask);
+		Task subTaskUpdated = taskManager.getSubTask(subTaskId);
+		assertNotNull(subTaskUpdated);
+		assertEquals(subTask, subTaskUpdated, "Изменённая подзадача не равна ожидаемой");
+	}
+
+	@Test
+	public void shouldUpdateEpic() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		SubTask subTask = createSubTask(1, epicId);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		epic.setId(epicId);
+		epic.setName("Измененный эпик");
+		epic.setStatus(Status.IN_PROGRESS);
+		epic.setDescription("Новое описание епика");
+		epic.addSubTaskId(subTaskId);
+		taskManager.updateEpic(epic);
+		Task epicUpdated = taskManager.getEpic(epicId);
+		assertNotNull(epicUpdated);
+		assertEquals(epic, epicUpdated, "Изменённая задача не равна ожидаемой");
 	}
 
 }
