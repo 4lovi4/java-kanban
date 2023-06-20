@@ -242,45 +242,132 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	public void shouldUpdateTask() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
-		task.setId(taskId);
-		task.setName("Измененная задач");
-		task.setStatus(Status.IN_PROGRESS);
-		task.setDescription("Новое описание задачи");
-		taskManager.updateTask(task);
+		Task newTask = createNewTask(2);
+		newTask.setId(taskId);
+		newTask.setName("Измененная задач");
+		newTask.setStatus(Status.IN_PROGRESS);
+		newTask.setDescription("Новое описание задачи");
+		assertNotEquals(newTask, task);
+		taskManager.updateTask(newTask);
 		Task taskUpdated = taskManager.getTask(taskId);
 		assertNotNull(taskUpdated);
-		assertEquals(task, taskUpdated, "Изменённая задача не равна ожидаемой");
+		assertEquals(newTask, taskUpdated, "Изменённая задача не равна ожидаемой");
+	}
+
+	@Test
+	public void shouldNotUpdateWrongTask() {
+		Task task = createNewTask(1);
+		int taskId = taskManager.addNewTask(task);
+		Task wrongTask = createNewTask(2);
+		int wrongTaskId = 1_000_000;
+		assertNotEquals(wrongTaskId, taskId);
+		wrongTask.setId(wrongTaskId);
+		wrongTask.setName("Измененная задач");
+		wrongTask.setStatus(Status.IN_PROGRESS);
+		wrongTask.setDescription("Новое описание задачи");
+		taskManager.updateTask(wrongTask);
+		assertFalse(taskManager.getAllTasks().contains(wrongTask), "Список всех задач содержит задачу с неверным Id");
+	}
+
+	@Test
+	public void shouldNotUpdateEmptyTasksList() {
+		Task task = createNewTask(1);
+		task.setStatus(Status.DONE);
+		taskManager.updateTask(task);
+		assertTrue(taskManager.getAllTasks().isEmpty(), "Список задач не пустой");
 	}
 
 	@Test
 	public void shouldUpdateSubTask() {
-		SubTask subTask = createSubTask(1, 0);
+		Epic epic1 = createNewEpic(1);
+		Epic epic2 = createNewEpic(2);
+		int epicId1 = taskManager.addNewEpic(epic1);
+		int epicId2 = taskManager.addNewEpic(epic2);
+		SubTask subTask = createSubTask(1, epicId1);
 		int subTaskId = taskManager.addNewSubTask(subTask);
-		subTask.setId(subTaskId);
-		subTask.setName("Измененная подзадача");
-		subTask.setStatus(Status.DONE);
-		subTask.setDescription("Новое описание подзадачи");
-		taskManager.updateTask(subTask);
+		SubTask newSubTask = createSubTask(2, epicId2);
+		newSubTask.setId(subTaskId);
+		newSubTask.setName("Измененная подзадача");
+		newSubTask.setStatus(Status.DONE);
+		newSubTask.setDescription("Новое описание подзадачи");
+		assertNotEquals(newSubTask, subTask);
+		taskManager.updateSubTask(newSubTask);
 		Task subTaskUpdated = taskManager.getSubTask(subTaskId);
 		assertNotNull(subTaskUpdated);
-		assertEquals(subTask, subTaskUpdated, "Изменённая подзадача не равна ожидаемой");
+		assertEquals(newSubTask, subTaskUpdated, "Изменённая подзадача не равна ожидаемой");
+	}
+
+	@Test
+	public void shouldNotUpdateWrongSubTask() {
+		Epic epic1 = createNewEpic(1);
+		Epic epic2 = createNewEpic(2);
+		int epicId1 = taskManager.addNewEpic(epic1);
+		int epicId2 = taskManager.addNewEpic(epic2);
+		SubTask subTask = createSubTask(1, epicId1);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		int wrongSubTaskId = 1_000_000;
+		assertNotEquals(wrongSubTaskId, subTaskId);
+		SubTask wrongSubTask = createSubTask(2, epicId2);
+		wrongSubTask.setId(wrongSubTaskId);
+		wrongSubTask.setName("Измененная подзадача");
+		wrongSubTask.setStatus(Status.DONE);
+		wrongSubTask.setDescription("Новое описание подзадачи");
+		assertNotEquals(wrongSubTask, subTask);
+		taskManager.updateSubTask(wrongSubTask);
+		assertFalse(taskManager.getAllTasks().contains(wrongSubTask), "Список всех подзадач содержит подзадачу с неверным Id");
+	}
+
+	@Test
+	public void shouldNotUpdateEmptySubTasksList() {
+		SubTask subTask = createSubTask(1, 1);
+		subTask.setStatus(Status.DONE);
+		taskManager.updateSubTask(subTask);
+		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список подзадач не пустой");
 	}
 
 	@Test
 	public void shouldUpdateEpic() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
+		Epic newEpic = createNewEpic(2);
 		SubTask subTask = createSubTask(1, epicId);
 		int subTaskId = taskManager.addNewSubTask(subTask);
-		epic.setId(epicId);
-		epic.setName("Измененный эпик");
-		epic.setStatus(Status.IN_PROGRESS);
-		epic.setDescription("Новое описание епика");
-		epic.addSubTaskId(subTaskId);
-		taskManager.updateEpic(epic);
+		newEpic.setId(epicId);
+		newEpic.setName("Измененный эпик");
+		newEpic.setStatus(Status.IN_PROGRESS);
+		newEpic.setDescription("Новое описание эпика");
+		newEpic.addSubTaskId(subTaskId);
+		assertNotEquals(newEpic, epic);
+		taskManager.updateEpic(newEpic);
 		Task epicUpdated = taskManager.getEpic(epicId);
 		assertNotNull(epicUpdated);
-		assertEquals(epic, epicUpdated, "Изменённая задача не равна ожидаемой");
+		assertEquals(newEpic, epicUpdated, "Изменённая задача не равна ожидаемой");
 	}
 
+	@Test
+	public void shouldNotUpdateWrongEpic() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		Epic wrongEpic = createNewEpic(2);
+		SubTask subTask = createSubTask(1, epicId);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		int wrongEpicId = 1_000_000;
+		assertNotEquals(wrongEpicId, epicId);
+		wrongEpic.setId(wrongEpicId);
+		wrongEpic.setName("Измененный эпик");
+		wrongEpic.setStatus(Status.IN_PROGRESS);
+		wrongEpic.setDescription("Новое описание эпика");
+		wrongEpic.addSubTaskId(subTaskId);
+		assertNotEquals(wrongEpic, epic);
+		taskManager.updateEpic(wrongEpic);
+		assertFalse(taskManager.getAllTasks().contains(wrongEpic), "Список всех эпиков содержит эпик с неверным Id");
+	}
+
+	@Test
+	public void shouldNotUpdateEmptyEpicList() {
+		Epic epic = createNewEpic(1);
+		epic.setStatus(Status.DONE);
+		taskManager.updateEpic(epic);
+		assertTrue(taskManager.getAllEpics().isEmpty(), "Список эпиков не пустой");
+	}
 }
