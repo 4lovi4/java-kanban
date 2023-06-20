@@ -190,6 +190,55 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	public void ShouldGetNullOnWrongTaskId() {
+		Task task = createNewTask(1);
+		int taskId = taskManager.addNewTask(task);
+		int wrongTaskId = 1_000_000;
+		assertNotEquals(wrongTaskId, taskId);
+		assertThrows(NullPointerException.class, () -> taskManager.getTask(wrongTaskId));
+	}
+
+	@Test
+	public void ShouldGetNullOnWrongEpicId() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		int wrongEpicId = 1_000_000;
+		assertNotEquals(wrongEpicId, epicId);
+		assertThrows(NullPointerException.class, () -> taskManager.getEpic(wrongEpicId));
+	}
+
+	@Test
+	public void ShouldGetNullOnWrongSubTaskId() {
+		SubTask subTask = createSubTask(1, 0);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		int wrongSubTaskId = 1_000_000;
+		assertNotEquals(wrongSubTaskId, subTaskId);
+		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(wrongSubTaskId));
+	}
+
+	@Test
+	public void ShouldGetNullOnEmptyTasksList() {
+		int taskId = 1;
+		assertTrue(taskManager.getAllTasks().isEmpty());
+		assertThrows(NullPointerException.class, () -> taskManager.getTask(taskId));
+	}
+
+	@Test
+	public void ShouldGetNullOnEmptyEpicsList() {
+		int epicId = 1;
+		assertTrue(taskManager.getAllEpics().isEmpty());
+		assertThrows(NullPointerException.class, () -> taskManager.getEpic(epicId));
+	}
+
+	@Test
+	public void ShouldGetNullOnEmptySubTasksList() {
+		int subTaskId = 1;
+		assertTrue(taskManager.getAllSubTasks().isEmpty());
+		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+	}
+
+
+	@Test
 	public void shouldUpdateTask() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
