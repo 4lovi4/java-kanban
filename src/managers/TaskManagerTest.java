@@ -2,6 +2,7 @@ package managers;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
@@ -12,9 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
 
-	abstract TaskManager getTaskManager();
+	abstract T getTaskManager();
 
-	TaskManager taskManager = getTaskManager();
+	T taskManager;
+
+	@BeforeEach
+	public void prepareTest() {
+		taskManager = getTaskManager();
+	}
 
 	public Task createNewTask(int counter) {
 		Task task = new Task(0, String.format("Задача %d Есть", counter),
@@ -187,6 +193,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		SubTask subTaskAdded = taskManager.getSubTask(subTaskId);
 		assertNotNull(subTaskAdded);
 		assertEquals(subTask, subTaskAdded, "Добавленная задача не равна ожидаемой");
+	}
+
+	@Test
+	public void shouldGetSubTasksByEpicId() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		SubTask subTask = createSubTask(1, epicId);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		subTask.setId(subTaskId);
+		assertEquals(1, taskManager.getSubTasksByEpic(epicId).size(), "Размер списка подзадач эпика не равен 1");
+		assertEquals(subTask, taskManager.getSubTasksByEpic(epicId).get(0), "Подзадача из эпика не равна добавленной");
 	}
 
 	@Test
@@ -406,6 +423,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		assertTrue(taskManager.getAllEpics().isEmpty(), "Список всех эпиков не пустой после удаления единственного эпика");
 	}
 
+	@Test
+	public void shouldDeleteEpicWithSubTask() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		SubTask subTask = createSubTask(1, epicId);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		subTask.setId(subTaskId);
+		assertTrue(taskManager.getSubTasksByEpic(epicId).contains(subTask));
+		taskManager.deleteEpic(epicId);
+		assertThrows(NullPointerException.class, () -> taskManager.getEpic(epicId));
+		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+		assertTrue(taskManager.getAllEpics().isEmpty(), "Список всех эпиков не пустой после удаления единственного эпика");
+		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список всех подзадач не пустой после удаления единственной подзадачи эпика");
+	}
+
 
 	@Test
 	public void shouldNotDeleteEpicWithWrongId() {
@@ -435,6 +467,20 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	public void shouldDeleteSubTaskFromEpic() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		SubTask subTask = createSubTask(1, epicId);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		subTask.setId(subTaskId);
+		assertTrue(taskManager.getSubTasksByEpic(epicId).contains(subTask));
+		taskManager.deleteSubTask(subTaskId);
+		assertTrue(taskManager.getSubTasksByEpic(epicId).isEmpty(), "Список подзадач для эпика не пустой после удаления единственной подзадачи");
+		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список всех подзадач не пустой после удаления единственной подзадачи эпика");
+	}
+
+	@Test
 	public void shouldNotDeleteSubTaskWithWrongId() {
 		SubTask subTask = createSubTask(1, 1);
 		int subTaskId = taskManager.addNewSubTask(subTask);
@@ -449,5 +495,47 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		int subTaskId = 1;
 		assertTrue(taskManager.getAllSubTasks().isEmpty());
 		assertDoesNotThrow(() -> taskManager.deleteSubTask(subTaskId));
+	}
+
+	@Test
+	public void shouldDeleteAllTasks() {
+		Task task = createNewTask(1);
+		taskManager.addNewTask(task);
+		taskManager.deleteAllTasks();
+		assertTrue(taskManager.getAllTasks().isEmpty(), "Список задач не пустой после удаления всех задач");
+	}
+
+	@Test
+	public void shouldDeleteAllTasksWithEmptyTaskList() {
+		assertDoesNotThrow(() -> taskManager.deleteAllTasks());
+		assertTrue(taskManager.getAllTasks().isEmpty(), "Список задач не пустой после удаления всех задач");
+	}
+
+	@Test
+	public void shouldDeleteAllEpics() {
+		Epic epic = createNewEpic(1);
+		taskManager.addNewEpic(epic);
+		taskManager.deleteAllEpics();
+		assertTrue(taskManager.getAllEpics().isEmpty(), "Список эпиков не пустой после удаления всех эпиков");
+	}
+
+	@Test
+	public void shouldDeleteAllEpicsWithEmptyEpicList() {
+		assertDoesNotThrow(() -> taskManager.deleteAllEpics());
+		assertTrue(taskManager.getAllEpics().isEmpty(), "Список эпиков не пустой после удаления всех эпиков");
+	}
+
+	@Test
+	public void shouldDeleteAllSubTasks() {
+		SubTask subTask = createSubTask(1, 1);
+		taskManager.addNewSubTask(subTask);
+		taskManager.deleteAllSubTasks();
+		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список подзадач не пустой после удаления всех подзадач");
+	}
+
+	@Test
+	public void shouldDeleteAllSubTasksWithEmptySubTaskList() {
+		assertDoesNotThrow(() -> taskManager.deleteAllSubTasks());
+		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список подзадач не пустой после удаления всех подзадач");
 	}
 }
