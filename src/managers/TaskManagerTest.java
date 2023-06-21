@@ -389,4 +389,65 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		taskManager.deleteTask(wrongTaskId);
 		assertEquals(1, taskManager.getAllTasks().size(), "Размер списка задач изменился после удаления задачи с неправильным id");
 	}
+
+	@Test
+	public void shouldNotInvokeExceptionForDeleteTaskFromEmptyList() {
+		int taskId = 1;
+		assertTrue(taskManager.getAllTasks().isEmpty());
+		assertDoesNotThrow(() -> taskManager.deleteTask(taskId));
+	}
+
+	@Test
+	public void shouldDeleteEpic() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		taskManager.deleteEpic(epicId);
+		assertThrows(NullPointerException.class, () -> taskManager.getEpic(epicId));
+		assertTrue(taskManager.getAllEpics().isEmpty(), "Список всех эпиков не пустой после удаления единственного эпика");
+	}
+
+
+	@Test
+	public void shouldNotDeleteEpicWithWrongId() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		int wrongEpicId = 1_000_000;
+		assertNotEquals(wrongEpicId, epicId);
+		taskManager.deleteEpic(wrongEpicId);
+		assertEquals(1, taskManager.getAllEpics().size(), "Размер списка эпиков изменился после удаления эпика с неправильным id");
+	}
+
+	@Test
+	public void shouldNotInvokeExceptionForDeleteEpicFromEmptyList() {
+		int epicId = 1;
+		assertTrue(taskManager.getAllEpics().isEmpty());
+		assertDoesNotThrow(() -> taskManager.deleteEpic(epicId));
+	}
+
+
+	@Test
+	public void shouldDeleteSubTask() {
+		SubTask subTask = createSubTask(1, 1);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		taskManager.deleteSubTask(subTaskId);
+		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список подзадач не пустой после удаления единственной подзадачи");
+	}
+
+	@Test
+	public void shouldNotDeleteSubTaskWithWrongId() {
+		SubTask subTask = createSubTask(1, 1);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		int wrongSubTaskId = 1_000_000;
+		assertNotEquals(wrongSubTaskId, subTaskId);
+		taskManager.deleteSubTask(wrongSubTaskId);
+		assertEquals(1, taskManager.getAllSubTasks().size(), "Размер списка подзадач изменился после удаления подзадачи с неправильным id");
+	}
+
+	@Test
+	public void shouldNotInvokeExceptionForDeleteSubTaskFromEmptyList() {
+		int subTaskId = 1;
+		assertTrue(taskManager.getAllSubTasks().isEmpty());
+		assertDoesNotThrow(() -> taskManager.deleteSubTask(subTaskId));
+	}
 }
