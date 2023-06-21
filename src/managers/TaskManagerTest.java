@@ -370,4 +370,23 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		taskManager.updateEpic(epic);
 		assertTrue(taskManager.getAllEpics().isEmpty(), "Список эпиков не пустой");
 	}
+
+	@Test
+	public void shouldDeleteTask() {
+		Task task = createNewTask(1);
+		int taskId = taskManager.addNewTask(task);
+		taskManager.deleteTask(taskId);
+		assertThrows(NullPointerException.class, () -> taskManager.getTask(taskId));
+		assertTrue(taskManager.getAllTasks().isEmpty(), "Список всех задач не пустой после удаления единственной задачи");
+	}
+
+	@Test
+	public void shouldNotDeleteTaskWithWrongId() {
+		Task task = createNewTask(1);
+		int taskId = taskManager.addNewTask(task);
+		int wrongTaskId = 1_000_000;
+		assertNotEquals(wrongTaskId, taskId);
+		taskManager.deleteTask(wrongTaskId);
+		assertEquals(1, taskManager.getAllTasks().size(), "Размер списка задач изменился после удаления задачи с неправильным id");
+	}
 }
