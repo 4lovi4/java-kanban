@@ -1,6 +1,8 @@
 package managers;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,8 +10,10 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
+import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
+import static managers.FileBackedTasksManager.loadFromFile;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,7 +59,19 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     public void shouldLoadTasksListFromFile() throws IOException {
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
         String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,\n";
-        String epicText = "1,EPIC,Загрузка Эпика,PROGRESS,Описание загрузки эпика,\n";
-        String subTaskText = "%d,SUBTASK,Загрузка Подзадачи,PROGRESS,Описание подзадачи 1,1\n\n";
+        String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,\n";
+        String subTaskText = "10,SUBTASK,Загрузка Подзадачи,IN_PROGRESS,Описание загрузки подзадачи,1\n\n";
+        try (FileWriter writer = new FileWriter(TEST_FILENAME, false)) {
+            writer.write(headerText + taskText + epicText + subTaskText);
+        }
+        FileBackedTasksManager manager = loadFromFile(new File(TEST_FILENAME));
+        Task task = new Task();
+        String[] taskFields = taskText.split(",");
+        task.setId(Integer.valueOf(taskFields[0]));
+        task.setName(taskFields[2]);
+        task.setStatus(Status.valueOf(taskFields[3]));
+        task.setDescription(taskFields[4]);
+        Task loadTask = manager.getTask(task.getId());
+        assertEquals(task, loadTask);
     }
 }

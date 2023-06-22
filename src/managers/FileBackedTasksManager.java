@@ -146,7 +146,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             throw new ManagerSaveException("Ошибка чтения из файла " + file.getName(), e);
         }
 
-        String[] contentLines = content.split("\n");
+        String[] contentLines = content.split("\n", -1);
         int i = 1;
         while (!contentLines[i].equals("")) {
             Task task = manager.fromString(contentLines[i]);
@@ -237,6 +237,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public static List<Integer> historyFromString(String historyLine) {
         ArrayList<Integer> history = new ArrayList<>();
+        if (historyLine.isEmpty()) {
+            return history;
+        }
         for (String id : historyLine.split(",")) {
             history.add(Integer.valueOf(id));
         }
