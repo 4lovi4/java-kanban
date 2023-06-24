@@ -23,7 +23,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    public List<Task> getTasks() {
+    private List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
         Node<Task> currentNode = first;
         while (currentNode != null) {
@@ -33,7 +33,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasks;
     }
 
-    public void removeNode(Node<Task> node) {
+    private void removeNode(Node<Task> node) {
         Node<Task> next = node.getNextNode();
         Node<Task> prev = node.getPrevNode();
         if (prev != null) {
