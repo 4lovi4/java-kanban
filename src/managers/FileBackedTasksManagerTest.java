@@ -1,13 +1,12 @@
 package managers;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
@@ -56,7 +55,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
-    public void shouldLoadTasksListFromFile() throws IOException {
+    public void shouldLoadTaskFromFileWithEmptyHistory() throws IOException {
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
         String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,\n";
         String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,\n";
@@ -65,13 +64,70 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
             writer.write(headerText + taskText + epicText + subTaskText);
         }
         FileBackedTasksManager manager = loadFromFile(new File(TEST_FILENAME));
-        Task task = new Task();
+
+        Task taskFromFile = new Task();
         String[] taskFields = taskText.split(",");
-        task.setId(Integer.valueOf(taskFields[0]));
-        task.setName(taskFields[2]);
-        task.setStatus(Status.valueOf(taskFields[3]));
-        task.setDescription(taskFields[4]);
-        Task loadTask = manager.getTask(task.getId());
-        assertEquals(task, loadTask);
+        int taskIdFromFile = Integer.valueOf(taskFields[0]);
+        taskFromFile.setId(taskIdFromFile);
+        taskFromFile.setName(taskFields[2]);
+        taskFromFile.setStatus(Status.valueOf(taskFields[3]));
+        taskFromFile.setDescription(taskFields[4]);
+        Task loadTask = manager.getTask(taskIdFromFile);
+        assertEquals(taskFromFile, loadTask);
+    }
+
+    @Test
+    public void shouldLoadEpicFromFileWithEmptyHistory() throws IOException {
+        String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
+        String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,\n";
+        String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,\n";
+        String subTaskText = "10,SUBTASK,Загрузка Подзадачи,IN_PROGRESS,Описание загрузки подзадачи,1\n\n";
+        try (FileWriter writer = new FileWriter(TEST_FILENAME, false)) {
+            writer.write(headerText + taskText + epicText + subTaskText);
+        }
+        FileBackedTasksManager manager = loadFromFile(new File(TEST_FILENAME));
+
+        Epic epicFromFile = new Epic();
+        String[] epicFields = epicText.split(",");
+        int epicIdFromFile = Integer.valueOf(epicFields[0]);
+        epicFromFile.setId(epicIdFromFile);
+        epicFromFile.setName(epicFields[2]);
+        epicFromFile.setStatus(Status.valueOf(epicFields[3]));
+        epicFromFile.setDescription(epicFields[4]);
+        Epic loadEpic = manager.getEpic(epicIdFromFile);
+        assertEquals(epicFromFile, loadEpic);
+    }
+
+    @Test
+    public void shouldLoadSubTaskFromFileWithEmptyHistory() throws IOException {
+        String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
+        String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,\n";
+        String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,\n";
+        String subTaskText = "10,SUBTASK,Загрузка Подзадачи,IN_PROGRESS,Описание загрузки подзадачи,1\n\n";
+        try (FileWriter writer = new FileWriter(TEST_FILENAME, false)) {
+            writer.write(headerText + taskText + epicText + subTaskText);
+        }
+        FileBackedTasksManager manager = loadFromFile(new File(TEST_FILENAME));
+
+        SubTask subTaskFromFile = new SubTask();
+        String[] subTaskFields = subTaskText.trim().split(",");
+        int subTaskIdFromFile = Integer.valueOf(subTaskFields[0]);
+        subTaskFromFile.setId(subTaskIdFromFile);
+        subTaskFromFile.setName(subTaskFields[2]);
+        subTaskFromFile.setStatus(Status.valueOf(subTaskFields[3]));
+        subTaskFromFile.setDescription(subTaskFields[4]);
+        subTaskFromFile.setEpicId(Integer.valueOf(subTaskFields[5]));
+        SubTask loadSubTask = manager.getSubTask(subTaskIdFromFile);
+        assertEquals(subTaskFromFile, loadSubTask);
+    }
+
+    @Test
+    public void shouldLoadEmptyTasksListsFromEmptyFile() throws IOException{
+        File testFile = new File(TEST_FILENAME);
+        FileBackedTasksManager manager = loadFromFile(testFile);
+        try (FileWriter writer = new FileWriter(TEST_FILENAME, false)) {
+            writer.write("");
+        }
+        assertTrue(manager.getAllTasks().isEmpty(), "Список задач не пустой");
     }
 }

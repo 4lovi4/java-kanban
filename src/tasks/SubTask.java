@@ -5,6 +5,10 @@ import java.util.Objects;
 public class SubTask extends Task{
     private int epicId;
 
+    public SubTask() {
+        super();
+    }
+
     public SubTask(int epicId) {
         super();
         this.epicId = epicId;
