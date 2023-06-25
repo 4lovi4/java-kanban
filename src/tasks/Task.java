@@ -9,7 +9,7 @@ public class Task {
     protected String name;
     protected String description;
     protected Status status;
-    protected Duration duration;
+    protected Long duration;
     protected LocalDateTime startTime;
 
     public Task() {
@@ -63,14 +63,14 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plusMinutes(duration.toMinutes());
+        return startTime.plusMinutes(duration);
     }
 
-    public Duration getDuration() {
+    public Long getDuration() {
         return duration;
     }
 
-    public void setDuration(Duration duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
 
@@ -89,6 +89,8 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 

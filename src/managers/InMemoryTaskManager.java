@@ -5,9 +5,9 @@ import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
 	public void setTaskIdCounter(int taskIdCounter) {
@@ -100,7 +100,7 @@ public class InMemoryTaskManager implements TaskManager {
 		epic.setId(taskIdCounter);
 		updateEpicStatus(epic.getId());
 		epics.put(epic.getId(), epic);
-
+		updateEpicTime(epic.getId());
 		return epic.getId();
 	}
 
@@ -217,6 +217,22 @@ public class InMemoryTaskManager implements TaskManager {
 		else {
 			epic.setStatus(Status.IN_PROGRESS);
 		}
+	}
+
+	public void updateEpicTime(int id) {
+		Epic epic = epics.get(id);
+		ArrayList<SubTask> epicSubTasksList = getSubTasksByEpic(id);
+		Optional<SubTask> subTaskMinStartTime = epicSubTasksList.stream().filter(subTask -> subTask.getStartTime() != null)
+				.min(Comparator.comparing(Task::getStartTime));
+		LocalDateTime minStartTime = subTaskMinStartTime.isEmpty() ? null : subTaskMinStartTime.get().getStartTime();
+		Optional<SubTask> subTaskMaxEndTime = epicSubTasksList.stream().filter(subTask -> subTask.getEndTime() != null)
+				.max(Comparator.comparing(Task::getStartTime));
+		LocalDateTime maxEndTime = subTaskMaxEndTime.isEmpty() ? null : subTaskMaxEndTime.get().getEndTime();
+		Long commonDuration = epicSubTasksList.stream().filter(subTask -> subTask.getDuration() != 0)
+				.map(subTask -> subTask.getDuration()).reduce(0L, Long::sum);
+		epic.setStartTime(minStartTime);
+		epic.setDuration(commonDuration);
+		epic.setEndTime(maxEndTime);
 	}
 
 	@Override
