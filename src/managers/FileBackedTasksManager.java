@@ -147,6 +147,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
 
         String[] contentLines = content.split("\n", -1);
+        if (contentLines.length == 0 || contentLines[0].equals("")) {
+            return manager;
+        }
         int i = 1;
         while (!contentLines[i].equals("")) {
             Task task = manager.fromString(contentLines[i]);
