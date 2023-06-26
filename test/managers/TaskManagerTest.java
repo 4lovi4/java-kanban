@@ -1,5 +1,6 @@
 package managers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -538,4 +539,57 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		assertDoesNotThrow(() -> taskManager.deleteAllSubTasks());
 		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список подзадач не пустой после удаления всех подзадач");
 	}
-}
+
+	@Test
+	public void shouldSetAndReturnTaskStartTime() {
+		Task task = createNewTask(1);
+		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
+		assertDoesNotThrow(() -> task.setStartTime(startTimeToSet));
+		LocalDateTime startTimeActual = task.getStartTime();
+		assertNotNull(startTimeActual);
+		assertEquals(startTimeToSet, startTimeActual, "Время начала задачи успешно задано");
+	}
+
+	@Test
+	public void shouldSetAndReturnTaskDuration() {
+		Task task = createNewTask(1);
+		Long durationToSet = 100L;
+		assertDoesNotThrow(() -> task.setDuration(durationToSet));
+		Long durationActual = task.getDuration();
+		assertNotNull(durationActual);
+		assertEquals(durationToSet, durationActual, "Длительность задачи в минутах успешно задано");
+	}
+	
+	@Test
+	public void shouldReturnTaskCorrectEndTime() {
+		Task task = createNewTask(1);
+		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
+		LocalDateTime endTimeExpected = (LocalDateTime.of(2023, 6, 24, 13, 0, 0));
+		Long durationToSet = 60L;
+		task.setStartTime(startTimeToSet);
+		task.setDuration(durationToSet);
+		LocalDateTime endTimeActual = task.getEndTime();
+		assertNotNull(endTimeActual);
+		assertEquals(endTimeExpected, endTimeActual, "Время окончания задачи не равно времени старта + длительность задачи");
+	}
+
+	@Test
+	public void shouldReturnNullEndTimeIfStartTimeNotSet() {
+		Task task = createNewTask(1);
+		assertDoesNotThrow(() -> task.getEndTime());
+		assertNull(task.getEndTime(), "Время окончания задачи не Null");
+	}
+
+	@Test
+	public void shouldReturnSubTaskCorrectEndTime() {
+		SubTask subTask = createSubTask(1, 10);
+		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
+		LocalDateTime endTimeExpected = (LocalDateTime.of(2023, 6, 24, 13, 0, 0));
+		Long durationToSet = 60L;
+		subTask.setStartTime(startTimeToSet);
+		subTask.setDuration(durationToSet);
+		LocalDateTime endTimeActual = subTask.getEndTime();
+		assertNotNull(endTimeActual);
+		assertEquals(endTimeExpected, endTimeActual, "Время окончания подзадачи не равно времени старта + длительность подзадачи");
+	}
+ }

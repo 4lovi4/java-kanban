@@ -228,7 +228,7 @@ public class InMemoryTaskManager implements TaskManager {
 		Optional<SubTask> subTaskMaxEndTime = epicSubTasksList.stream().filter(subTask -> subTask.getEndTime() != null)
 				.max(Comparator.comparing(Task::getStartTime));
 		LocalDateTime maxEndTime = subTaskMaxEndTime.isEmpty() ? null : subTaskMaxEndTime.get().getEndTime();
-		Long commonDuration = epicSubTasksList.stream().filter(subTask -> subTask.getDuration() != 0)
+		Long commonDuration = epicSubTasksList.stream().filter(subTask -> subTask.getDuration() != null)
 				.map(subTask -> subTask.getDuration()).reduce(0L, Long::sum);
 		epic.setStartTime(minStartTime);
 		epic.setDuration(commonDuration);

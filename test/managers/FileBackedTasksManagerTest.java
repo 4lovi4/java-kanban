@@ -35,7 +35,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         int subTaskId = taskManager.addNewSubTask(subTask);
         String fileContentExpected = "id,type,name,status,description,epic,start_time,duration,end_time\n" +
                 String.format("%d,TASK,Задача 100 Есть,NEW,Описание задачи 100,,,,\n", taskId) +
-                String.format("%d,EPIC,Эпик 10 Есть,NEW,Описание задачи 10,,,,\n", epicId) +
+                String.format("%d,EPIC,Эпик 10 Есть,NEW,Описание задачи 10,,,0,\n", epicId) +
                 String.format("%d,SUBTASK,Подзадача 1,NEW,Описание подзадачи 1,%d,,,\n\n", subTaskId, epicId);
         assertDoesNotThrow(() -> taskManager.save());
         Path path = Paths.get(TEST_FILENAME);
