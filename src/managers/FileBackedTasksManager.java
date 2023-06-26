@@ -1,5 +1,6 @@
 package managers;
 
+import java.time.format.DateTimeFormatter;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
@@ -184,15 +185,29 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private String toString(Task task) {
         TaskType taskType = TaskType.TASK;
+        String startTimeText = task.getStartTime() != null
+                ? task.getStartTime().format(DateTimeFormatter.ISO_DATE_TIME) : "";
+        String endTimeText = task.getEndTime() != null
+                ? task.getEndTime().format(DateTimeFormatter.ISO_DATE_TIME) : "";
+        String durationText = task.getDuration() != null
+                ? task.getDuration().toString() : "";
         if (task instanceof Epic) {
             taskType = TaskType.EPIC;
         }
-        return String.format("%d,%s,%s,%s,%s,",task.getId(), taskType, task.getName(), task.getStatus(), task.getDescription());
+        return String.format("%d,%s,%s,%s,%s,,%s,%s,%s",task.getId(), taskType, task.getName(), task.getStatus(),
+                task.getDescription(), startTimeText, durationText, endTimeText);
     }
 
     private String toString(SubTask subTask) {
-        return String.format("%d,%s,%s,%s,%s,%d", subTask.getId(), TaskType.SUBTASK, subTask.getName(),
-                subTask.getStatus(), subTask.getDescription(), subTask.getEpicId());
+        String startTimeText = subTask.getStartTime() != null
+                ? subTask.getStartTime().format(DateTimeFormatter.ISO_DATE_TIME) : "";
+        String endTimeText = subTask.getEndTime() != null
+                ? subTask.getEndTime().format(DateTimeFormatter.ISO_DATE_TIME) : "";
+        String durationText = subTask.getDuration() != null
+                ? subTask.getDuration().toString() : "";
+        return String.format("%d,%s,%s,%s,%s,%d,%s,%s,%s", subTask.getId(), TaskType.SUBTASK, subTask.getName(),
+                subTask.getStatus(), subTask.getDescription(), subTask.getEpicId(),
+                startTimeText, durationText, endTimeText);
     }
 
     private Task fromString(String taskValue) throws TaskFormatException {
