@@ -57,9 +57,9 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     @Test
     public void shouldLoadTasksFromFileWithEmptyHistory() throws IOException {
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
-        String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,\n";
-        String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,\n";
-        String subTaskText = "10,SUBTASK,Загрузка Подзадачи,IN_PROGRESS,Описание загрузки подзадачи,1\n\n";
+        String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,,,,\n";
+        String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,,,,\n";
+        String subTaskText = "10,SUBTASK,Загрузка Подзадачи,IN_PROGRESS,Описание загрузки подзадачи,1,,,\n\n";
         try (FileWriter writer = new FileWriter(TEST_FILENAME, false)) {
             writer.write(headerText + taskText + epicText + subTaskText);
         }
@@ -100,9 +100,9 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     @Test
     public void shouldLoadTasksFromFileWithHistory() throws IOException {
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
-        String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,\n";
-        String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,\n";
-        String subTaskText = "10,SUBTASK,Загрузка Подзадачи,IN_PROGRESS,Описание загрузки подзадачи,1\n\n";
+        String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,,,,\n";
+        String epicText = "1,EPIC,Загрузка Эпика,IN_PROGRESS,Описание загрузки эпика,,,,\n";
+        String subTaskText = "10,SUBTASK,Загрузка Подзадачи,IN_PROGRESS,Описание загрузки подзадачи,1,,,\n\n";
         String historyText = "1,100,12\n";
         try (FileWriter writer = new FileWriter(TEST_FILENAME, false)) {
             writer.write(headerText + taskText + epicText + subTaskText + historyText);

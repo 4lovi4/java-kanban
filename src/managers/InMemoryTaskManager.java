@@ -60,6 +60,7 @@ public class InMemoryTaskManager implements TaskManager {
 			epic.getSubTasksId().clear();
 			epics.put(epic.getId(), epic);
 			updateEpicStatus(epic.getId());
+			updateEpicTime(epic.getId());
 		}
 		subTasks.clear();
 	}
@@ -115,6 +116,7 @@ public class InMemoryTaskManager implements TaskManager {
 		if (epic != null && !epic.getSubTasksId().contains(subTask.getId())) {
 			epic.addSubTaskId(subTask.getId());
 			updateEpicStatus(epic.getId());
+			updateEpicTime(epic.getId());
 		}
 		return subTask.getId();
 	}
@@ -140,6 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
 		if (epic == null) return;
 		subTasks.put(subTask.getId(), subTask);
 		updateEpicStatus(epic.getId());
+		updateEpicTime(epic.getId());
 	}
 
 	@Override
@@ -170,6 +173,7 @@ public class InMemoryTaskManager implements TaskManager {
 				epic.deleteSubTaskId(id);
 				epics.put(epic.getId(), epic);
 				updateEpicStatus(epic.getId());
+				updateEpicTime(epic.getId());
 			}
 		}
 		subTasks.remove(id);

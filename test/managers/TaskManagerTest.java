@@ -581,6 +581,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	public void shouldReturnNullEndTimeIfDurationNotSet() {
+		Task task = createNewTask(1);
+		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
+		task.setStartTime(startTimeToSet);
+		assertDoesNotThrow(() -> task.getEndTime());
+		assertNull(task.getEndTime(), "Время окончания задачи не Null");
+	}
+
+	@Test
 	public void shouldReturnSubTaskCorrectEndTime() {
 		SubTask subTask = createSubTask(1, 10);
 		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
@@ -591,5 +600,30 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		LocalDateTime endTimeActual = subTask.getEndTime();
 		assertNotNull(endTimeActual);
 		assertEquals(endTimeExpected, endTimeActual, "Время окончания подзадачи не равно времени старта + длительность подзадачи");
+	}
+
+	@Test
+	public void shouldCalculateEpicEndTimeAndDuration() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		SubTask subTask1 = createSubTask(1, epicId);
+		SubTask subTask2 = createSubTask(2, epicId);
+		LocalDateTime startTime1 = LocalDateTime.of(2023, 6, 24, 9, 30);
+		Long duration1 = 60L;
+		LocalDateTime startTime2 = LocalDateTime.of(2023, 6, 24, 11, 40);
+		Long duration2 = 120L;
+		subTask1.setStartTime(startTime1);
+		subTask1.setDuration(duration1);
+		subTask2.setStartTime(startTime2);
+		subTask2.setDuration(duration2);
+		LocalDateTime endTime2 = subTask2.getEndTime();
+		taskManager.addNewSubTask(subTask1);
+		taskManager.addNewSubTask(subTask2);
+		LocalDateTime epicStartTime = epic.getStartTime();
+		Long epicDuration = epic.getDuration();
+		LocalDateTime epicEndTime = epic.getEndTime();
+		assertEquals(duration1 + duration2, epicDuration, "Продолжительность эпика не равна сумме длительности подзадач");
+		assertEquals(startTime1, epicStartTime, "Время начала эпика не совпадает с самым ранним временем начала подзадач");
+		assertEquals(endTime2, epicEndTime, "Время окончания эпика не совпадает с самым поздним временем окончания подзадач");
 	}
  }

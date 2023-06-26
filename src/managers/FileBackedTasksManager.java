@@ -1,5 +1,6 @@
 package managers;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import tasks.Epic;
 import tasks.SubTask;
@@ -11,6 +12,7 @@ import exception.ManagerSaveException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -211,12 +213,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private Task fromString(String taskValue) throws TaskFormatException {
-        String[] taskFields = taskValue.split(",");
+        String[] taskFields = taskValue.split(",", -1);
         Task result;
 
         try {
             TaskType taskType = TaskType.valueOf(taskFields[1]);
-
+            LocalDateTime startTime = taskFields[6].isEmpty() ? null :
+                    LocalDateTime.parse(taskFields[6], DateTimeFormatter.ISO_DATE_TIME);
+            Long duration = taskFields[7].isEmpty() ? null :
+                    Long.valueOf(taskFields[7]);
+            LocalDateTime endTime = taskFields[8].isEmpty() ? null :
+                    LocalDateTime.parse(taskFields[8], DateTimeFormatter.ISO_DATE_TIME);
             switch (taskType) {
                 case EPIC:
                     result = new Epic(Integer.parseInt(taskFields[0]), taskFields[2], taskFields[3], taskFields[4]);
@@ -231,9 +238,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     result = new Task();
                     break;
             }
+            result.setStartTime(startTime);
+            result.setDuration(duration);
         } catch (IndexOutOfBoundsException e) {
             throw new TaskFormatException("Число полей в сохранённой строке не соответствует ожидаемому: " + taskValue, e);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | DateTimeParseException e) {
             throw new TaskFormatException("Неверный формат данных в сохранённой строке: " + taskValue, e);
         }
         return result;
