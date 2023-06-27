@@ -1,6 +1,7 @@
 package managers;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -625,5 +626,30 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		assertEquals(duration1 + duration2, epicDuration, "Продолжительность эпика не равна сумме длительности подзадач");
 		assertEquals(startTime1, epicStartTime, "Время начала эпика не совпадает с самым ранним временем начала подзадач");
 		assertEquals(endTime2, epicEndTime, "Время окончания эпика не совпадает с самым поздним временем окончания подзадач");
+	}
+
+	@Test
+	public void shouldGetPrioritizedTasks() {
+		Task taskWithTime = createNewTask(1);
+		LocalDateTime startTime1 = LocalDateTime.of(2023, 6, 24, 12, 0);
+		Long duration1 = 60L;
+		taskWithTime.setStartTime(startTime1);
+		taskWithTime.setDuration(duration1);
+		int taskIdWithTime = taskManager.addNewTask(taskWithTime);
+		taskWithTime.setId(taskIdWithTime);
+		Task taskWithoutTime = createNewTask(2);
+		int taskIdWithoutTime = taskManager.addNewTask(taskWithoutTime);
+		taskWithoutTime.setId(taskIdWithoutTime);
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		epic.setId(epicId);
+		SubTask subTask = createSubTask(1, epicId);
+		LocalDateTime startTime2 = LocalDateTime.of(2023, 6, 24, 13, 0);
+		Long duration2 = 120L;
+		subTask.setStartTime(startTime2);
+		subTask.setDuration(duration2);
+		int subTaskId = taskManager.addNewSubTask(subTask);
+		subTask.setId(subTaskId);
+		ArrayList<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
 	}
  }
