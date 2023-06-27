@@ -20,7 +20,7 @@ public class InMemoryTaskManager implements TaskManager {
 	protected final HashMap<Integer, SubTask> subTasks;
 	protected final InMemoryHistoryManager historyManager;
 
-	protected TreeSet<Task> prioritizedTasks = new TreeSet<>(new CompareStartTime());
+	protected TreeSet<Task> prioritizedTasks = new TreeSet<>( new CompareStartTime());
 //			Comparator.comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
 //			.thenComparing(Task::getId, Comparator.nullsLast(Comparator.naturalOrder())));
 
@@ -28,13 +28,19 @@ public class InMemoryTaskManager implements TaskManager {
 
 		@Override
 		public int compare(Task o1, Task o2) {
+			if (o1.getId() == o2.getId()) {
+				return 0;
+			}
 			if (o1.getStartTime() == null && o2.getStartTime() == null) {
 				return Integer.compare(o1.getId(),o2.getId());
-			} else if (o1.getStartTime() != null && o2.getStartTime() == null) {
+			}
+			if (o1.getStartTime() != null && o2.getStartTime() == null) {
 				return -1;
-			} else if (o1.getStartTime() == null && o2.getStartTime() != null) {
+			}
+			if (o1.getStartTime() == null && o2.getStartTime() != null) {
 				return 1;
-			} else if (o1.getStartTime().equals(o2.getStartTime())) {
+			}
+			if (o1.getStartTime().equals(o2.getStartTime())) {
 				return Integer.compare(o1.getId(), o2.getId());
 			} else {
 				return o1.getStartTime().compareTo(o2.getStartTime());
@@ -144,13 +150,14 @@ public class InMemoryTaskManager implements TaskManager {
 			epic.addSubTaskId(subTask.getId());
 			updateEpicStatus(epic.getId());
 			updateEpicTime(epic.getId());
-			if (prioritizedTasks.stream().filter(t -> t.getId() == epic.getId()).findFirst().isPresent()) {
-				prioritizedTasks.remove(epic);
-				prioritizedTasks.add(epic);
+			Optional<Task> epicInPrioritized = prioritizedTasks.stream().filter(t -> t.getId() == epic.getId()).findFirst();
+			if (epicInPrioritized.isPresent())	{
+				prioritizedTasks.remove(epicInPrioritized.get());
+				prioritizedTasks.add(epicInPrioritized.get());
 			}
 		}
 		if (prioritizedTasks.stream().filter(t -> t.getId() == subTask.getId()).findFirst().isEmpty()) {
-			boolean r = prioritizedTasks.add(subTask);
+			prioritizedTasks.add(subTask);
 		}
 		return subTask.getId();
 	}
