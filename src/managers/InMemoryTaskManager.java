@@ -4,10 +4,8 @@ import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
-
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
 	public void setTaskIdCounter(int taskIdCounter) {
@@ -20,19 +18,22 @@ public class InMemoryTaskManager implements TaskManager {
 	protected final HashMap<Integer, SubTask> subTasks;
 	protected final InMemoryHistoryManager historyManager;
 
-	protected TreeSet<Task> prioritizedTasks = new TreeSet<>( new CompareStartTime());
+	protected TreeSet<Task> prioritizedTasks = new TreeSet<>(new CompareStartTime());
 //			Comparator.comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
 //			.thenComparing(Task::getId, Comparator.nullsLast(Comparator.naturalOrder())));
 
-	class CompareStartTime implements Comparator<Task> {
+	static class CompareStartTime implements Comparator<Task> {
 
 		@Override
 		public int compare(Task o1, Task o2) {
+			if (o1.equals(o2)) {
+				return 0;
+			}
 			if (o1.getId() == o2.getId()) {
 				return 0;
 			}
 			if (o1.getStartTime() == null && o2.getStartTime() == null) {
-				return Integer.compare(o1.getId(),o2.getId());
+				return Integer.compare(o1.getId(), o2.getId());
 			}
 			if (o1.getStartTime() != null && o2.getStartTime() == null) {
 				return -1;
@@ -116,11 +117,14 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public int addNewTask(Task task) {
+		if (!validateTaskTime(task)) {
+			return -1;
+		}
 		taskIdCounter++;
 		task.setId(taskIdCounter);
 		tasks.put(task.getId(), task);
 		if (prioritizedTasks.stream().filter(t -> t.getId() == task.getId()).findFirst().isEmpty()) {
-			boolean r = prioritizedTasks.add(task);
+			prioritizedTasks.add(task);
 		}
 		return task.getId();
 	}
@@ -133,13 +137,16 @@ public class InMemoryTaskManager implements TaskManager {
 		epics.put(epic.getId(), epic);
 		updateEpicTime(epic.getId());
 		if (prioritizedTasks.stream().filter(t -> t.getId() == epic.getId()).findFirst().isEmpty()) {
-			boolean r = prioritizedTasks.add(epic);
+			prioritizedTasks.add(epic);
 		}
 		return epic.getId();
 	}
 
 	@Override
 	public int addNewSubTask(SubTask subTask) {
+		if (!validateTaskTime(subTask)) {
+			return -1;
+		}
 		taskIdCounter++;
 		subTask.setId(taskIdCounter);
 		subTasks.put(subTask.getId(), subTask);
@@ -147,18 +154,13 @@ public class InMemoryTaskManager implements TaskManager {
 		int epicId = subTask.getEpicId();
 		Epic epic = epics.get(epicId);
 		if (epic != null && !epic.getSubTasksId().contains(subTask.getId())) {
+			prioritizedTasks.remove(epic);
 			epic.addSubTaskId(subTask.getId());
 			updateEpicStatus(epic.getId());
 			updateEpicTime(epic.getId());
-			Optional<Task> epicInPrioritized = prioritizedTasks.stream().filter(t -> t.getId() == epic.getId()).findFirst();
-			if (epicInPrioritized.isPresent())	{
-				prioritizedTasks.remove(epicInPrioritized.get());
-				prioritizedTasks.add(epicInPrioritized.get());
-			}
+			prioritizedTasks.add(epic);
 		}
-		if (prioritizedTasks.stream().filter(t -> t.getId() == subTask.getId()).findFirst().isEmpty()) {
-			prioritizedTasks.add(subTask);
-		}
+		prioritizedTasks.add(subTask);
 		return subTask.getId();
 	}
 
@@ -306,6 +308,20 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public ArrayList<Task> getPrioritizedTasks() {
-		return new ArrayList<Task>(prioritizedTasks);
+		return new ArrayList<>(prioritizedTasks);
+	}
+
+	@Override
+	public boolean validateTaskTime(Task task) {
+		if (task.getStartTime() == null ||
+				task.getClass() == Epic.class) {
+			return true;
+		}
+		return !getPrioritizedTasks().stream().filter(t -> t.getClass() != Epic.class && t.getStartTime() != null && t.getEndTime() != null)
+				.anyMatch(t -> (task.getStartTime().isAfter(t.getStartTime()) && task.getEndTime().isBefore(t.getEndTime()))
+						|| (task.getStartTime().isAfter(t.getStartTime()) && task.getEndTime().isAfter(t.getEndTime())
+						&& task.getStartTime().isBefore(t.getEndTime()))
+						|| (task.getStartTime().isBefore(t.getStartTime()) && task.getEndTime().isAfter(t.getStartTime()))
+				);
 	}
 }

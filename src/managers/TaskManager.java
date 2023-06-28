@@ -48,4 +48,6 @@ public interface TaskManager {
 	List<Task> getHistory();
 
 	ArrayList<Task> getPrioritizedTasks();
+
+	boolean validateTaskTime(Task task);
 }

@@ -629,7 +629,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
-	public void shouldGetPrioritizedTasks() {
+	public void shouldGetPrioritizedByStartTimeTasks() {
 		Task taskWithTime = createNewTask(1);
 		LocalDateTime startTime1 = LocalDateTime.of(2023, 6, 24, 12, 0);
 		Long duration1 = 60L;
@@ -650,6 +650,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		subTask.setDuration(duration2);
 		int subTaskId = taskManager.addNewSubTask(subTask);
 		subTask.setId(subTaskId);
-		ArrayList<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+		ArrayList<Task> expectedPrioritizedTasks = new ArrayList<>();
+		expectedPrioritizedTasks.add(taskWithTime);
+		expectedPrioritizedTasks.add(epic);
+		expectedPrioritizedTasks.add(subTask);
+		expectedPrioritizedTasks.add(taskWithoutTime);
+		ArrayList<Task> actualPrioritizedTasks = taskManager.getPrioritizedTasks();
+		assertEquals(expectedPrioritizedTasks, actualPrioritizedTasks,
+				"Список задач всех типов приоритезированный по времени старта не соответствует ожидаемому");
 	}
  }
