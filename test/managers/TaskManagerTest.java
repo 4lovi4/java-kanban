@@ -102,6 +102,19 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	public void shouldReturnEpicInProgressStatusForNewAndInProgressSubTasks() {
+		Epic epic = createNewEpic(1);
+		int epicId = taskManager.addNewEpic(epic);
+		SubTask subTask1 = createSubTask(0, epicId);
+		assertEquals(Status.NEW, subTask1.getStatus());
+		SubTask subTask2 = createSubTask(1, epicId);
+		subTask2.setStatus(Status.IN_PROGRESS);
+		taskManager.addNewSubTask(subTask1);
+		taskManager.addNewSubTask(subTask2);
+		assertEquals(Status.IN_PROGRESS, epic.getStatus(), String.format("Статус эпика со всеми подзадачами в статусе NEW и IN_PROGRESS не равен %s", Status.IN_PROGRESS));
+	}
+
+	@Test
 	public void shouldGetAllTasksList() {
 		Task task1 = createNewTask(1);
 		Task task2 = createNewTask(2);

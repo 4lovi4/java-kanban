@@ -7,11 +7,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
+import tasks.TaskType;
+
 import static managers.FileBackedTasksManager.loadFromFile;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,14 +23,36 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
 
     private static final String TEST_FILENAME = "test_tasks.csv";
-
+    private static final String EMPTY_TEST_FILENAME = "empty_test_tasks.csv";
+    private static final String WRONG_TEST_FILENAME = "wrong_test_tasks.csv";
     @Override
     FileBackedTasksManager getTaskManager() {
         return new FileBackedTasksManager(new File(TEST_FILENAME));
     }
 
+    public Task createTaskFromText(String text) {
+        Task task = new Task();
+        String[] taskFields = text.split(",", -1);
+        if (TaskType.valueOf(taskFields[1]).equals(TaskType.EPIC)) {
+            task = new Epic();
+        } else if (TaskType.valueOf(taskFields[1]).equals(TaskType.SUBTASK)) {
+            task = new SubTask();
+            ((SubTask) task).setEpicId(Integer.valueOf(taskFields[5]));
+        }
+        int taskId = Integer.valueOf(taskFields[0]);
+        task.setId(taskId);
+        task.setName(taskFields[2]);
+        task.setStatus(Status.valueOf(taskFields[3]));
+        task.setDescription(taskFields[4]);
+        LocalDateTime startTime = taskFields[6].equals("") ? null : LocalDateTime.parse(taskFields[6], DateTimeFormatter.ISO_DATE_TIME);
+        task.setStartTime(startTime);
+        Long duration = taskFields[7].equals("") ? null : Long.valueOf(taskFields[7]);
+        task.setDuration(duration);
+        return task;
+    }
+
     @Test
-    public void shouldSaveTasksListInFile() throws IOException {
+    public void shouldSaveTasksAllTypesInFileCorrectly() throws IOException {
         Task task = createNewTask(100);
         int taskId = taskManager.addNewTask(task);
         Epic epic = createNewEpic(10);
@@ -45,7 +71,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
-    public void shouldSaveEmptyTasksListInFile() throws IOException {
+    public void shouldSaveEmptyTasksInFile() throws IOException {
         String fileContentExpected = "id,type,name,status,description,epic,start_time,duration,end_time\n\n";
         assertDoesNotThrow(() -> taskManager.save());
         Path path = Paths.get(TEST_FILENAME);
@@ -65,36 +91,17 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         }
         FileBackedTasksManager manager = loadFromFile(new File(TEST_FILENAME));
 
-        Task taskFromFile = new Task();
-        String[] taskFields = taskText.split(",");
-        int taskIdFromFile = Integer.valueOf(taskFields[0]);
-        taskFromFile.setId(taskIdFromFile);
-        taskFromFile.setName(taskFields[2]);
-        taskFromFile.setStatus(Status.valueOf(taskFields[3]));
-        taskFromFile.setDescription(taskFields[4]);
-        Task loadTask = manager.getTask(taskIdFromFile);
-        assertEquals(taskFromFile, loadTask);
+        Task taskFromText = createTaskFromText(taskText);
+        Task taskLoadedFromFile = manager.getTask(taskFromText.getId());
+        assertEquals(taskFromText, taskLoadedFromFile);
 
-        Epic epicFromFile = new Epic();
-        String[] epicFields = epicText.split(",");
-        int epicIdFromFile = Integer.valueOf(epicFields[0]);
-        epicFromFile.setId(epicIdFromFile);
-        epicFromFile.setName(epicFields[2]);
-        epicFromFile.setStatus(Status.valueOf(epicFields[3]));
-        epicFromFile.setDescription(epicFields[4]);
-        Epic loadEpic = manager.getEpic(epicIdFromFile);
-        assertEquals(epicFromFile, loadEpic);
+        Epic epicFromText = (Epic) createTaskFromText(epicText);
+        Epic epicLoadedFromFile = manager.getEpic(epicFromText.getId());
+        assertEquals(epicFromText, epicLoadedFromFile);
 
-        SubTask subTaskFromFile = new SubTask();
-        String[] subTaskFields = subTaskText.trim().split(",");
-        int subTaskIdFromFile = Integer.valueOf(subTaskFields[0]);
-        subTaskFromFile.setId(subTaskIdFromFile);
-        subTaskFromFile.setName(subTaskFields[2]);
-        subTaskFromFile.setStatus(Status.valueOf(subTaskFields[3]));
-        subTaskFromFile.setDescription(subTaskFields[4]);
-        subTaskFromFile.setEpicId(Integer.valueOf(subTaskFields[5]));
-        SubTask loadSubTask = manager.getSubTask(subTaskIdFromFile);
-        assertEquals(subTaskFromFile, loadSubTask);
+        SubTask subTaskFromText = (SubTask) createTaskFromText(subTaskText);
+        SubTask subTaskLoadedFromFile = manager.getSubTask(subTaskFromText.getId());
+        assertEquals(subTaskFromText, subTaskLoadedFromFile);
     }
 
     @Test
