@@ -23,7 +23,7 @@ public class HttpTaskServer {
     public HttpTaskServer() throws IOException {
         server = HttpServer.create(new InetSocketAddress("localhost", TASK_SERVER_PORT), 0);
         manager = Managers.getFileBackedTaskManager();
-        server.createContext("/tasks/task", new TaskHandler())
+        server.createContext("/tasks/task", new TaskHandler(manager));
     }
 
     public void start() {
