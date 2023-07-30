@@ -1,10 +1,10 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import managers.Managers;
 import managers.TaskManager;
 import tasks.Epic;
 import tasks.SubTask;
@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class HttpTaskServer {
@@ -65,6 +66,7 @@ public class HttpTaskServer {
                         os.write(tasksPayload);
                     }
                 }
+
                 if (path.equals("/tasks/task")) {
                     String[] queryIdParam = query.split("=");
                     if (!queryIdParam[0].equals("id")) {
@@ -87,34 +89,321 @@ public class HttpTaskServer {
                             return;
                         }
                     }
-                    String taskData =  getTaskById(TaskType.TASK, taskId);
+                    String taskData = getTaskById(TaskType.TASK, taskId);
                     if (taskData.equals("")) {
                         byte[] message = String.format("Задача %d не найдена", taskId).getBytes();
                         exchange.sendResponseHeaders(404, message.length);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(message);
                         }
-                    }
-                    else {
+                    } else {
                         byte[] taskPayload = taskData.getBytes();
                         exchange.sendResponseHeaders(200, taskPayload.length);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(taskPayload);
                         }
                     }
-                }
-                else if (path.equals("/tasks/epic")) {
+                } else if (path.equals("/tasks/epic")) {
+                    String[] queryIdParam = query.split("=");
+                    if (!queryIdParam[0].equals("id")) {
+                        byte[] message = "Неверный формат id эпика в запросе".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
 
+                    int epicId = 0;
+                    try {
+                        epicId = Integer.parseInt(queryIdParam[1]);
+                    } catch (NumberFormatException | NullPointerException e) {
+                        byte[] message = "Неверный формат id эпика в запросе".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
+                    String taskData = getTaskById(TaskType.EPIC, epicId);
+                    if (taskData.equals("")) {
+                        byte[] message = String.format("Эпик %d не найдена", epicId).getBytes();
+                        exchange.sendResponseHeaders(404, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                        }
+                    } else {
+                        byte[] epicPayload = taskData.getBytes();
+                        exchange.sendResponseHeaders(200, epicPayload.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(epicPayload);
+                        }
+                    }
+                } else if (path.equals("/tasks/subtask")) {
+                    String[] queryIdParam = query.split("=");
+                    if (!queryIdParam[0].equals("id")) {
+                        byte[] message = "Неверный формат id подзадачи в запросе".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
+
+                    int subTaskId = 0;
+                    try {
+                        subTaskId = Integer.parseInt(queryIdParam[1]);
+                    } catch (NumberFormatException | NullPointerException e) {
+                        byte[] message = "Неверный формат id подзадачи в запросе".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
+                    String taskData = getTaskById(TaskType.TASK, subTaskId);
+                    if (taskData.equals("")) {
+                        byte[] message = String.format("Подзадача %d не найдена", subTaskId).getBytes();
+                        exchange.sendResponseHeaders(404, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                        }
+                    } else {
+                        byte[] subTaskPayload = taskData.getBytes();
+                        exchange.sendResponseHeaders(200, subTaskPayload.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(subTaskPayload);
+                        }
+                    }
+                } else if (path.equals("/tasks/history")) {
+                    List<Task> historyTask = manager.getHistory();
+                    byte[] tasksPayload = gson.toJson(historyTask).getBytes();
+                    exchange.sendResponseHeaders(200, tasksPayload.length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(tasksPayload);
+                    }
+                }
+                else {
+                    byte[] message = String.format("Задан неправильный endpoint GET %s", path).getBytes();
+                    exchange.sendResponseHeaders(400, message.length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(message);
+                    }
+                }
+            }
+            if (method.equals("DELETE")) {
+                if (path.equals("/tasks/task")) {
+                    if (query.isEmpty()) {
+                        deleteTasks(TaskType.TASK, -1);
+                        byte[] message = "Все обычные задачи удалены".getBytes();
+                        exchange.sendResponseHeaders(204, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                        }
+                    } else {
+                        String[] queryIdParam = query.split("=");
+                        if (!queryIdParam[0].equals("id")) {
+                            byte[] message = "Неверный формат id задачи в запросе".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        }
+
+                        int taskId = 0;
+                        try {
+                            taskId = Integer.parseInt(queryIdParam[1]);
+                        } catch (NumberFormatException | NullPointerException e) {
+                            byte[] message = "Неверный формат id задачи в запросе".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        }
+                        if (taskId <= 0) {
+                            byte[] message = "id задачи должен быть положительным числом".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        } else {
+                            deleteTasks(TaskType.TASK, taskId);
+                            byte[] message = String.format("Задача id = %d удалена", taskId).getBytes();
+                            exchange.sendResponseHeaders(204, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                            }
+                        }
+                    }
                 }
                 else if (path.equals("/tasks/subtask")) {
+                    if (query.isEmpty()) {
+                        deleteTasks(TaskType.SUBTASK, -1);
+                        byte[] message = "Все подзадачи удалены".getBytes();
+                        exchange.sendResponseHeaders(204, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                        }
+                    } else {
+                        String[] queryIdParam = query.split("=");
+                        if (!queryIdParam[0].equals("id")) {
+                            byte[] message = "Неверный формат id подзадачи в запросе".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        }
 
+                        int subTaskId = 0;
+                        try {
+                            subTaskId = Integer.parseInt(queryIdParam[1]);
+                        } catch (NumberFormatException | NullPointerException e) {
+                            byte[] message = "Неверный формат id подзадачи в запросе".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        }
+                        if (subTaskId <= 0) {
+                            byte[] message = "id подзадачи должен быть положительным числом".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        } else {
+                            deleteTasks(TaskType.SUBTASK, subTaskId);
+                            byte[] message = String.format("Подзадача id = %d удалена", subTaskId).getBytes();
+                            exchange.sendResponseHeaders(204, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                            }
+                        }
+                    }
+                }
+                else if (path.equals("/tasks/epic")) {
+                    if (query.isEmpty()) {
+                        deleteTasks(TaskType.EPIC, -1);
+                        byte[] message = "Все эпики удалены".getBytes();
+                        exchange.sendResponseHeaders(204, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                        }
+                    } else {
+                        String[] queryIdParam = query.split("=");
+                        if (!queryIdParam[0].equals("id")) {
+                            byte[] message = "Неверный формат id эпика в запросе".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        }
+
+                        int epicId = 0;
+                        try {
+                            epicId = Integer.parseInt(queryIdParam[1]);
+                        } catch (NumberFormatException | NullPointerException e) {
+                            byte[] message = "Неверный формат id эпика в запросе".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        }
+                        if (epicId <= 0) {
+                            byte[] message = "id эпика должен быть положительным числом".getBytes();
+                            exchange.sendResponseHeaders(400, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                                return;
+                            }
+                        } else {
+                            deleteTasks(TaskType.TASK, epicId);
+                            byte[] message = String.format("Эпик id = %d удален", epicId).getBytes();
+                            exchange.sendResponseHeaders(204, message.length);
+                            try (OutputStream os = exchange.getResponseBody()) {
+                                os.write(message);
+                            }
+                        }
+                    }
+                }
+                else {
+                    byte[] message = String.format("Задан неправильный endpoint DELETE %s", path).getBytes();
+                    exchange.sendResponseHeaders(400, message.length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(message);
+                    }
                 }
             }
-            if (method.equals("DELETE") && path.matches("/tasks/task")) {
-            }
 
-            if (method.equals("POST") && path.matches("/tasks/task")) {
-
+            if (method.equals("POST")) {
+                if (path.equals("/tasks/task")) {
+                    Task taskData;
+                    try {
+                        taskData = gson.fromJson(body, Task.class);
+                    } catch (JsonSyntaxException e) {
+                        byte[] message = "Неправильный формат json для задачи".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
+                    int taskId = createUpdateTask(taskData);
+                    exchange.sendResponseHeaders(204, Integer.toString(taskId).getBytes().length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(Integer.toString(taskId).getBytes());
+                    }
+                }
+                else if (path.equals("/tasks/subtask")) {
+                    SubTask subTaskData;
+                    try {
+                        subTaskData = gson.fromJson(body, SubTask.class);
+                    } catch (JsonSyntaxException e) {
+                        byte[] message = "Неправильный формат json для подзадачи".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
+                    int subTaskId = createUpdateTask(subTaskData);
+                    exchange.sendResponseHeaders(204, Integer.toString(subTaskId).getBytes().length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(Integer.toString(subTaskId).getBytes());
+                    }
+                }
+                else if (path.equals("/tasks/epic")) {
+                    Epic epicData;
+                    try {
+                        epicData = gson.fromJson(body, Epic.class);
+                    } catch (JsonSyntaxException e) {
+                        byte[] message = "Неправильный формат json для эпика".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
+                    int epicId = createUpdateTask(epicData);
+                    exchange.sendResponseHeaders(204, Integer.toString(epicId).getBytes().length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(Integer.toString(epicId).getBytes());
+                    }
+                }
+                else {
+                    byte[] message = String.format("Задан неправильный endpoint POST %s", path).getBytes();
+                    exchange.sendResponseHeaders(400, message.length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(message);
+                    }
+                }
             }
         }
 
@@ -145,6 +434,56 @@ public class HttpTaskServer {
                 }
             }
             return taskPayload;
+        }
+
+        private void deleteTasks(TaskType taskType, int id) {
+            switch (taskType) {
+                case TASK: {
+                    if (id > 0) {
+                        manager.deleteTask(id);
+                    } else {
+                        manager.deleteAllTasks();
+                    }
+                }
+                case SUBTASK: {
+                    if (id > 0) {
+                        manager.deleteSubTask(id);
+                    } else {
+                        manager.deleteAllSubTasks();
+                    }
+                }
+                case EPIC: {
+                    if (id > 0) {
+                        manager.deleteEpic(id);
+                    } else {
+                        manager.deleteAllEpics();
+                    }
+                }
+            }
+        }
+
+        private int createUpdateTask(Task task) {
+            int responseId = task.getId();
+            if (task instanceof SubTask) {
+                if (Objects.isNull(manager.getSubTask(responseId))) {
+                    responseId = manager.addNewSubTask((SubTask) task);
+                } else {
+                    manager.updateSubTask((SubTask) task);
+                }
+            } else if (task instanceof Epic) {
+                if (Objects.isNull(manager.getEpic(responseId))) {
+                    responseId = manager.addNewEpic((Epic) task);
+                } else {
+                    manager.updateEpic((Epic) task);
+                }
+            } else {
+                if (Objects.isNull(manager.getTask(responseId))) {
+                    responseId = manager.addNewTask(task);
+                } else {
+                    manager.updateTask(task);
+                }
+            }
+            return responseId;
         }
     }
 }

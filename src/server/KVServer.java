@@ -24,8 +24,40 @@ public class KVServer {
 		server.createContext("/load", this::load);
 	}
 
-	private void load(HttpExchange h) {
-		// TODO Добавьте получение значения по ключу
+	private void load(HttpExchange h) throws IOException {
+		try {
+			System.out.println("\n/load");
+
+			if (!hasAuth(h)) {
+				System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+				h.sendResponseHeaders(403, 0);
+				return;
+			}
+			if (!"GET".equals(h.getRequestMethod())) {
+				System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
+				h.sendResponseHeaders(405, 0);
+			}
+			else {
+				String key = h.getRequestURI().getPath().substring("/load/".length());
+
+				if (key.isEmpty()) {
+					System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
+					h.sendResponseHeaders(400, 0);
+					return;
+				}
+
+				String response = "[]";
+				if (data.containsKey(key)) {
+					response = data.get(key);
+				}
+
+				System.out.println(String.format("Отправляем ответ: %s", response));
+				sendText(h, response);
+			}
+		}
+		finally {
+			h.close();
+		}
 	}
 
 	private void save(HttpExchange h) throws IOException {
@@ -80,6 +112,11 @@ public class KVServer {
 		System.out.println("Открой в браузере http://localhost:" + PORT + "/");
 		System.out.println("API_TOKEN: " + apiToken);
 		server.start();
+	}
+
+	public void stop() {
+		System.out.println("Останавливаем KV сервер");
+		server.stop(1);
 	}
 
 	private String generateApiToken() {
