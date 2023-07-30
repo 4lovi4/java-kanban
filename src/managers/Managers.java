@@ -4,7 +4,7 @@ import java.io.File;
 
 public class Managers {
 	public static TaskManager getDefault() {
-		return new InMemoryTaskManager();
+		return new HttpTaskManager(new File("server_tasks.csv"));
 	}
 
 	public static TaskManager getFileBackedTaskManager() {

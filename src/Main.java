@@ -1,14 +1,16 @@
+import server.HttpTaskServer;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 import managers.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		InMemoryTaskManager manager = (InMemoryTaskManager) Managers.getDefault();
 
 		// Создание эпиков и подзадач
@@ -67,5 +69,8 @@ public class Main {
 		System.out.println("История запросов: " + manager.getHistory());
 		manager.deleteEpic(epicOne.getId());
 		System.out.println("История запросов: " + manager.getHistory());
+
+		HttpTaskServer taskServer = new HttpTaskServer(manager);
+		taskServer.start();
 	}
 }
