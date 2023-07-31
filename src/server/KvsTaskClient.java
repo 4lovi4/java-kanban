@@ -15,7 +15,7 @@ public class KvsTaskClient {
 
 
     public KvsTaskClient() {
-        String uriStr =  String.format("http://%s:%d/%s", host, port);
+        String uriStr =  String.format("http://%s:%d", host, port);
         apiToken = "DEBUG";
         client = HttpClient.newHttpClient();
     }
@@ -24,8 +24,8 @@ public class KvsTaskClient {
         this.port = port;
         this.host = host;
         this.client = HttpClient.newHttpClient();
-        String uriStr =  String.format("http://%s:%d/%s", host, port);
-        URI registerUri = URI.create(String.format(uriStr, "register"));
+        String uriStr =  String.format("http://%s:%d", host, port);
+        URI registerUri = URI.create(String.format(uriStr + "/%s", "register"));
         HttpRequest registerRequest = HttpRequest.newBuilder().uri(registerUri).GET().build();
         try {
             HttpResponse<String> registerResponse = client.send(registerRequest, HttpResponse.BodyHandlers.ofString());
