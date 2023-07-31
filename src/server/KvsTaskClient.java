@@ -9,13 +9,13 @@ import java.net.http.HttpResponse;
 public class KvsTaskClient {
     private int port = 8078;
     private String host = "localhost";
-    private URI uri;
+    private String uriStr;
     private String apiToken;
     HttpClient client;
 
 
     public KvsTaskClient() {
-        String uriStr =  String.format("http://%s:%d", host, port);
+        uriStr = String.format("http://%s:%d", host, port);
         apiToken = "DEBUG";
         client = HttpClient.newHttpClient();
     }
@@ -24,15 +24,25 @@ public class KvsTaskClient {
         this.port = port;
         this.host = host;
         this.client = HttpClient.newHttpClient();
-        String uriStr =  String.format("http://%s:%d", host, port);
-        URI registerUri = URI.create(String.format(uriStr + "/%s", "register"));
-        HttpRequest registerRequest = HttpRequest.newBuilder().uri(registerUri).GET().build();
+        uriStr = String.format("http://%s:%d", host, port);
         try {
+            URI registerUri = URI.create(String.format(uriStr + "/%s", "register"));
+            HttpRequest registerRequest = HttpRequest.newBuilder().uri(registerUri).GET().build();
             HttpResponse<String> registerResponse = client.send(registerRequest, HttpResponse.BodyHandlers.ofString());
             apiToken = registerResponse.body();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Ошибка клиента в запросе GET /register");
+        }
+    }
+
+    public void save(String key, String value) {
+        try {
+            URI saveUri = URI.create(String.format(uriStr + "/%s/%s?API_TOKEN=%s", "save", key, apiToken));
+            HttpRequest saveRequest = HttpRequest.newBuilder().uri(saveUri).POST(HttpRequest.BodyPublishers.ofString(value)).build();
+            HttpResponse<String> saveResponse = client.send(saveRequest, HttpResponse.BodyHandlers.ofString());
         }
         catch (IOException | InterruptedException e) {
-            throw new RuntimeException(String.format("Ошибка клиента в запросе GET %s", uri.getPath()));
+            throw new RuntimeException(String.format("Ошибка при сохранении на сервере по ключу %s", key));
         }
     }
 }

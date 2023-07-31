@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		InMemoryTaskManager manager = (InMemoryTaskManager) Managers.getDefault();
+		HttpTaskManager manager = (HttpTaskManager) Managers.getDefault();
 
 		// Создание эпиков и подзадач
 		Epic epicOne = new Epic(0,"Эпик 1", "Первый эпик");
