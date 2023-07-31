@@ -41,7 +41,7 @@ public class KVServer {
 				String key = h.getRequestURI().getPath().substring("/load/".length());
 
 				if (key.isEmpty()) {
-					System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
+					System.out.println("Key для сохранения пустой. key указывается в пути: /load/{key}");
 					h.sendResponseHeaders(400, 0);
 					return;
 				}
