@@ -33,11 +33,11 @@ public class HttpTaskServer {
         server = HttpServer.create(new InetSocketAddress("localhost", TASK_SERVER_PORT), 0);
         this.manager = manager;
         server.createContext("/tasks", new TaskManagerHandler());
-        gson = new Gson();
+        gson = JsonAdapter.getGson();
     }
 
     public void start() {
-        System.out.println("Сервер менеджер задач запущен и доступен по адресу " + server.getAddress().toString());
+        System.out.println("Сервер менеджера задач запущен и доступен по адресу " + server.getAddress().toString());
         server.start();
     }
 
@@ -58,7 +58,7 @@ public class HttpTaskServer {
             String body = new String(stream.readAllBytes(), DEFAULT_CHARSET);
 
             if (method.equals("GET")) {
-                if (path.equals("/tasks")) {
+                if (path.matches("^/tasks/?$")) {
                     ArrayList<Task> prioritizedTasks = manager.getPrioritizedTasks();
                     byte[] tasksPayload = gson.toJson(prioritizedTasks).getBytes();
                     exchange.sendResponseHeaders(200, tasksPayload.length);
@@ -67,7 +67,7 @@ public class HttpTaskServer {
                     }
                 }
 
-                if (path.equals("/tasks/task")) {
+                if (path.matches("^/tasks/task/?\\?id=\\d+$")) {
                     String[] queryIdParam = query.split("=");
                     if (!queryIdParam[0].equals("id")) {
                         byte[] message = "Неверный формат id задачи в запросе".getBytes();
@@ -103,7 +103,7 @@ public class HttpTaskServer {
                             os.write(taskPayload);
                         }
                     }
-                } else if (path.equals("/tasks/epic")) {
+                } else if (path.matches("^/tasks/epic/?\\?id=\\d+$")) {
                     String[] queryIdParam = query.split("=");
                     if (!queryIdParam[0].equals("id")) {
                         byte[] message = "Неверный формат id эпика в запросе".getBytes();
@@ -139,7 +139,7 @@ public class HttpTaskServer {
                             os.write(epicPayload);
                         }
                     }
-                } else if (path.equals("/tasks/subtask")) {
+                } else if (path.matches("^/tasks/subtask/?\\?id=\\d$")) {
                     String[] queryIdParam = query.split("=");
                     if (!queryIdParam[0].equals("id")) {
                         byte[] message = "Неверный формат id подзадачи в запросе".getBytes();
@@ -175,7 +175,7 @@ public class HttpTaskServer {
                             os.write(subTaskPayload);
                         }
                     }
-                } else if (path.equals("/tasks/history")) {
+                } else if (path.matches("^/tasks/history/?$")) {
                     List<Task> historyTask = manager.getHistory();
                     byte[] tasksPayload = gson.toJson(historyTask).getBytes();
                     exchange.sendResponseHeaders(200, tasksPayload.length);
@@ -192,7 +192,7 @@ public class HttpTaskServer {
                 }
             }
             if (method.equals("DELETE")) {
-                if (path.equals("/tasks/task")) {
+                if (path.equals("^/tasks/task/?.*$")) {
                     if (query.isEmpty()) {
                         deleteTasks(TaskType.TASK, -1);
                         byte[] message = "Все обычные задачи удалены".getBytes();
@@ -239,7 +239,7 @@ public class HttpTaskServer {
                         }
                     }
                 }
-                else if (path.equals("/tasks/subtask")) {
+                else if (path.matches("^/tasks/subtask/?.*$")) {
                     if (query.isEmpty()) {
                         deleteTasks(TaskType.SUBTASK, -1);
                         byte[] message = "Все подзадачи удалены".getBytes();
@@ -286,7 +286,7 @@ public class HttpTaskServer {
                         }
                     }
                 }
-                else if (path.equals("/tasks/epic")) {
+                else if (path.matches("^/tasks/epic/?.*$")) {
                     if (query.isEmpty()) {
                         deleteTasks(TaskType.EPIC, -1);
                         byte[] message = "Все эпики удалены".getBytes();
@@ -343,7 +343,7 @@ public class HttpTaskServer {
             }
 
             if (method.equals("POST")) {
-                if (path.equals("/tasks/task")) {
+                if (path.matches("^/tasks/task/?$")) {
                     Task taskData;
                     try {
                         taskData = gson.fromJson(body, Task.class);
@@ -361,7 +361,7 @@ public class HttpTaskServer {
                         os.write(Integer.toString(taskId).getBytes());
                     }
                 }
-                else if (path.equals("/tasks/subtask")) {
+                else if (path.equals("^/tasks/subtask/?$")) {
                     SubTask subTaskData;
                     try {
                         subTaskData = gson.fromJson(body, SubTask.class);
@@ -379,7 +379,7 @@ public class HttpTaskServer {
                         os.write(Integer.toString(subTaskId).getBytes());
                     }
                 }
-                else if (path.equals("/tasks/epic")) {
+                else if (path.matches("^/tasks/epic/?$")) {
                     Epic epicData;
                     try {
                         epicData = gson.fromJson(body, Epic.class);
@@ -404,6 +404,12 @@ public class HttpTaskServer {
                         os.write(message);
                     }
                 }
+            }
+
+            byte[] message = String.format("Неправильный метод % %", method, path).getBytes();
+            exchange.sendResponseHeaders(405, message.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(message);
             }
         }
 

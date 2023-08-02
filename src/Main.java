@@ -1,4 +1,5 @@
 import server.HttpTaskServer;
+import server.KVServer;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
@@ -13,18 +14,26 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		HttpTaskManager manager = (HttpTaskManager) Managers.getDefault();
 
+		KVServer kvServer = new KVServer();
+		kvServer.start();
+
+		HttpTaskServer taskServer = new HttpTaskServer(manager);
+		taskServer.start();
+
 		// Создание эпиков и подзадач
 		Epic epicOne = new Epic(0,"Эпик 1", "Первый эпик");
 		Epic epicTwo = new Epic(0, "Эпик 2", "Второй эпик");
 		SubTask subTaskOne = new SubTask(0, "Подзадача 1", "Подзадача из 1го эпика", 0);
 		SubTask subTaskTwo = new SubTask(0, "Подзадача 2", "Подзадача из 1го эпика", 0);
 		SubTask subTaskThree = new SubTask(0, "Подзадача 3", "Подзадача из 2го эпика", 0);
+		Task taskOne = new Task(0, "Задача 1", "Обычная задача");
 
 		manager.addNewEpic(epicOne);
 		manager.addNewEpic(epicTwo);
 		manager.addNewSubTask(subTaskOne);
 		manager.addNewSubTask(subTaskTwo);
 		manager.addNewSubTask(subTaskThree);
+		manager.addNewTask(taskOne);
 		ArrayList<Task> allTasks = manager.getAllTasks();
 		ArrayList<Epic> allEpics = manager.getAllEpics();
 		ArrayList<SubTask> allSubTasks = manager.getAllSubTasks();
@@ -70,7 +79,5 @@ public class Main {
 		manager.deleteEpic(epicOne.getId());
 		System.out.println("История запросов: " + manager.getHistory());
 
-		HttpTaskServer taskServer = new HttpTaskServer(manager);
-		taskServer.start();
 	}
 }

@@ -13,7 +13,6 @@ public class KvsTaskClient {
     private String apiToken;
     HttpClient client;
 
-
     public KvsTaskClient() {
         uriStr = String.format("http://%s:%d", host, port);
         apiToken = "DEBUG";
@@ -44,5 +43,19 @@ public class KvsTaskClient {
         catch (IOException | InterruptedException e) {
             throw new RuntimeException(String.format("Ошибка при сохранении на сервере по ключу %s", key));
         }
+    }
+
+    public String load(String key) {
+        String responseValue = "";
+        try {
+            URI saveUri = URI.create(String.format(uriStr + "/%s/%s?API_TOKEN=%s", "load", key, apiToken));
+            HttpRequest saveRequest = HttpRequest.newBuilder().uri(saveUri).GET().build();
+            HttpResponse<String> loadResponse = client.send(saveRequest, HttpResponse.BodyHandlers.ofString());
+            responseValue = loadResponse.body();
+        }
+        catch (IOException | InterruptedException e) {
+            throw new RuntimeException(String.format("Ошибка при сохранении на сервере по ключу %s", key));
+        }
+        return responseValue;
     }
 }
