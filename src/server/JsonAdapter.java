@@ -14,7 +14,7 @@ public class JsonAdapter {
 
     public static Gson getGson() {
         return new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter().nullSafe())
                 .create();
     }
 

@@ -30,6 +30,15 @@ public class Task {
         this.status = Status.valueOf(status);
     }
 
+    public Task(int id,  String name, String status, String description, LocalDateTime startTime, Long duration) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = Status.valueOf(status);
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     public String getName() {
         return name;
     }
