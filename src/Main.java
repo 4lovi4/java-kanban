@@ -1,14 +1,12 @@
+import managers.impl.HttpTaskManager;
+import managers.impl.Managers;
 import server.HttpTaskServer;
 import server.KVServer;
 import tasks.Epic;
-import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
-import managers.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class Main {
 
@@ -33,6 +31,26 @@ public class Main {
 		subTaskTwo.setEpicId(epicId);
 		int subTaskOneId = manager.addNewSubTask(subTaskOne);
 		int subTaskTwoId = manager.addNewSubTask(subTaskTwo);
+
+		System.out.println(manager.getAllTasks());
+		System.out.println(manager.getAllEpics());
+		System.out.println(manager.getAllSubTasks());
+		System.out.println(manager.getHistory());
+
+		manager.getTask(taskId);
+		manager.getEpic(epicId);
+		System.out.println(manager.getEpic(epicId).getSubTasksId());
+		manager.getSubTask(subTaskOneId);
+
+		System.out.println(manager.getHistory());
+
+		manager.deleteSubTask(subTaskTwoId);
+
+		System.out.println(manager.getAllSubTasks());
+		System.out.println(manager.getEpic(epicId));
+		System.out.println(manager.getEpic(epicId).getSubTasksId());
+
+		System.out.println(manager.getHistory());
 
 		taskServer.stop();
 		kvServer.stop();

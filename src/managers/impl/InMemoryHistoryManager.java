@@ -1,9 +1,10 @@
-package managers;
+package managers.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import managers.HistoryManager;
 import tasks.Task;
 
 public class InMemoryHistoryManager implements HistoryManager {

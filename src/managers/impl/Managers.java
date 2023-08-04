@@ -1,4 +1,10 @@
-package managers;
+package managers.impl;
+
+import managers.HistoryManager;
+import managers.TaskManager;
+import managers.impl.FileBackedTasksManager;
+import managers.impl.HttpTaskManager;
+import managers.impl.InMemoryHistoryManager;
 
 import java.io.File;
 
