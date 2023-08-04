@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import managers.impl.FileBackedTasksManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,7 @@ import tasks.SubTask;
 import tasks.Task;
 import tasks.TaskType;
 
-import static managers.FileBackedTasksManager.loadFromFile;
+import static managers.impl.FileBackedTasksManager.loadFromFile;
 
 import static org.junit.jupiter.api.Assertions.*;
 
