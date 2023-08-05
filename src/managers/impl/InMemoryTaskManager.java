@@ -6,7 +6,14 @@ import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.TreeSet;
+import java.util.List;
+import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
+
 
 public class InMemoryTaskManager implements TaskManager {
 	public void setTaskIdCounter(int taskIdCounter) {
@@ -20,8 +27,6 @@ public class InMemoryTaskManager implements TaskManager {
 	protected final InMemoryHistoryManager historyManager;
 
 	protected TreeSet<Task> prioritizedTasks = new TreeSet<>(new CompareStartTime());
-//			Comparator.comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
-//			.thenComparing(Task::getId, Comparator.nullsLast(Comparator.naturalOrder())));
 
 	static class CompareStartTime implements Comparator<Task> {
 
