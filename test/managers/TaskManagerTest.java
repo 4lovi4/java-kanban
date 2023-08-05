@@ -227,7 +227,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		int taskId = taskManager.addNewTask(task);
 		int wrongTaskId = 1_000_000;
 		assertNotEquals(wrongTaskId, taskId);
-		assertThrows(NullPointerException.class, () -> taskManager.getTask(wrongTaskId));
+		assertNull(taskManager.getTask(wrongTaskId));
 	}
 
 	@Test
@@ -236,7 +236,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		int epicId = taskManager.addNewEpic(epic);
 		int wrongEpicId = 1_000_000;
 		assertNotEquals(wrongEpicId, epicId);
-		assertThrows(NullPointerException.class, () -> taskManager.getEpic(wrongEpicId));
+		assertNull(taskManager.getEpic(wrongEpicId));
 	}
 
 	@Test
@@ -245,28 +245,28 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		int subTaskId = taskManager.addNewSubTask(subTask);
 		int wrongSubTaskId = 1_000_000;
 		assertNotEquals(wrongSubTaskId, subTaskId);
-		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(wrongSubTaskId));
+		assertNull(taskManager.getSubTask(wrongSubTaskId));
 	}
 
 	@Test
 	public void ShouldGetNullOnEmptyTasksList() {
 		int taskId = 1;
 		assertTrue(taskManager.getAllTasks().isEmpty());
-		assertThrows(NullPointerException.class, () -> taskManager.getTask(taskId));
+		assertNull(taskManager.getTask(taskId));
 	}
 
 	@Test
 	public void ShouldGetNullOnEmptyEpicsList() {
 		int epicId = 1;
 		assertTrue(taskManager.getAllEpics().isEmpty());
-		assertThrows(NullPointerException.class, () -> taskManager.getEpic(epicId));
+		assertNull(taskManager.getEpic(epicId));
 	}
 
 	@Test
 	public void ShouldGetNullOnEmptySubTasksList() {
 		int subTaskId = 1;
 		assertTrue(taskManager.getAllSubTasks().isEmpty());
-		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+		assertNull(taskManager.getSubTask(subTaskId));
 	}
 
 
@@ -408,7 +408,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
 		taskManager.deleteTask(taskId);
-		assertThrows(NullPointerException.class, () -> taskManager.getTask(taskId));
+		assertNull(taskManager.getTask(taskId));
 		assertTrue(taskManager.getAllTasks().isEmpty(), "Список всех задач не пустой после удаления единственной задачи");
 	}
 
@@ -434,7 +434,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
 		taskManager.deleteEpic(epicId);
-		assertThrows(NullPointerException.class, () -> taskManager.getEpic(epicId));
+		assertNull(taskManager.getEpic(epicId));
 		assertTrue(taskManager.getAllEpics().isEmpty(), "Список всех эпиков не пустой после удаления единственного эпика");
 	}
 
@@ -447,8 +447,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		subTask.setId(subTaskId);
 		assertTrue(taskManager.getSubTasksByEpic(epicId).contains(subTask));
 		taskManager.deleteEpic(epicId);
-		assertThrows(NullPointerException.class, () -> taskManager.getEpic(epicId));
-		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+		assertNull(taskManager.getEpic(epicId));
+		assertNull(taskManager.getSubTask(subTaskId));
 		assertTrue(taskManager.getAllEpics().isEmpty(), "Список всех эпиков не пустой после удаления единственного эпика");
 		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список всех подзадач не пустой после удаления единственной подзадачи эпика");
 	}
@@ -477,7 +477,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		SubTask subTask = createSubTask(1, 1);
 		int subTaskId = taskManager.addNewSubTask(subTask);
 		taskManager.deleteSubTask(subTaskId);
-		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+		assertNull(taskManager.getSubTask(subTaskId));
 		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список подзадач не пустой после удаления единственной подзадачи");
 	}
 
@@ -491,7 +491,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 		assertTrue(taskManager.getSubTasksByEpic(epicId).contains(subTask));
 		taskManager.deleteSubTask(subTaskId);
 		assertTrue(taskManager.getSubTasksByEpic(epicId).isEmpty(), "Список подзадач для эпика не пустой после удаления единственной подзадачи");
-		assertThrows(NullPointerException.class, () -> taskManager.getSubTask(subTaskId));
+		assertNull(taskManager.getSubTask(subTaskId));
 		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список всех подзадач не пустой после удаления единственной подзадачи эпика");
 	}
 
