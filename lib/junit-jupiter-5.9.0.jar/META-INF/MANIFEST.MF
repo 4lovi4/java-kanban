@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Build-Date: 2022-07-26
+Build-Revision: 3ed71dff121ff4cfe6355195f274244c7acea0bd 
+Build-Time: 21:08:27.338+0200
+Built-By: JUnit Team
+Bundle-ManifestVersion: 2
+Bundle-Name: JUnit Jupiter (Aggregator)
+Bundle-SymbolicName: junit-jupiter
+Bundle-Version: 5.9.0
+Created-By: 17.0.4 (BellSoft 17.0.4+8-LTS)
+Implementation-Title: junit-jupiter
+Implementation-Vendor: junit.org
+Implementation-Version: 5.9.0
+Import-Package: org.junit.platform.commons.logging;status=INTERNAL;ver
+ sion="[1.9,2)"
+Specification-Title: junit-jupiter
+Specification-Vendor: junit.org
+Specification-Version: 5.9.0
+

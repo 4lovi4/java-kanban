@@ -7,14 +7,16 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		HttpTaskManager manager = (HttpTaskManager) Managers.getDefault();
 
 		KVServer kvServer = new KVServer();
 		kvServer.start();
+
+		HttpTaskManager manager = (HttpTaskManager) Managers.getDefault();
 
 		HttpTaskServer taskServer = new HttpTaskServer(manager);
 		taskServer.start();
@@ -24,6 +26,14 @@ public class Main {
 		SubTask subTaskOne = new SubTask(0, "Подзадача 1", "NEW", "Подзадача 1 из 1го эпика", 0);
 		SubTask subTaskTwo = new SubTask(0, "Подзадача 2", "NEW", "Подзадача 2 из 1го эпика", 0);
 		Task taskOne = new Task(0, "Задача 1", "NEW", "Обычная задача");
+
+		LocalDateTime startTime = LocalDateTime.now().minusDays(1L);
+		Long duration = 60L;
+
+		taskOne.setStartTime(startTime);
+		taskOne.setDuration(duration);
+		subTaskOne.setStartTime(startTime.minusHours(2));
+		subTaskOne.setDuration(duration);
 
 		int taskId = manager.addNewTask(taskOne);
 		int epicId = manager.addNewEpic(epicOne);

@@ -18,7 +18,7 @@ public class JsonAdapter {
                 .create();
     }
 
-    static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
+    private static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
         @Override
         public void write(final JsonWriter jsonWriter, final LocalDateTime dateTime) throws IOException {
             jsonWriter.value(dateTime.format(DateTimeFormatter.ISO_DATE_TIME));

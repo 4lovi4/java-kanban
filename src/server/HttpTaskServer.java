@@ -26,7 +26,7 @@ public class HttpTaskServer {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final HttpServer server;
     protected TaskManager manager;
-    Gson gson;
+    private Gson gson;
 
 
     public HttpTaskServer(TaskManager manager) throws IOException {

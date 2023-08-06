@@ -2,13 +2,13 @@ package managers.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import managers.impl.FileBackedTasksManager;
 import server.JsonAdapter;
 import server.KvsTaskClient;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +20,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
     public static final String EPIC_KEY = "epic";
     public static final String HISTORY_KEY = "history";
 
-    Gson gson;
-    KvsTaskClient kvsClient;
+    private Gson gson;
+    private KvsTaskClient kvsClient;
 
     public HttpTaskManager(String kvsUrl)
     {
@@ -29,8 +29,13 @@ public class HttpTaskManager extends FileBackedTasksManager {
         String[] kvsUrlParts = kvsUrl.replaceAll("^http://", "").split(":");
         String host = kvsUrlParts[0];
         int port = Integer.parseInt(kvsUrlParts[1]);
-        kvsClient = new KvsTaskClient();
         gson = JsonAdapter.getGson();
+        try {
+            kvsClient = new KvsTaskClient(port, host);
+        }
+        catch (RuntimeException e) {
+            throw new RuntimeException("Ошибка при создании клиента kv-сервера");
+        }
     }
 
     @Override
@@ -51,7 +56,18 @@ public class HttpTaskManager extends FileBackedTasksManager {
         kvsClient.save(HISTORY_KEY, historyJson);
     }
 
-    public void loadFromServer() {
+    public static HttpTaskManager loadFromServer(String kvServerUrl) {
+        HttpTaskManager manager;
+        KvsTaskClient kvsClient;
+        Gson gson = JsonAdapter.getGson();
+        try {
+            manager = new HttpTaskManager(kvServerUrl);
+            kvsClient = new KvsTaskClient();
+        }
+        catch (RuntimeException e) {
+            throw new RuntimeException("Ошибка при создании клиента kv-сервера");
+        }
+
         String tasksJson = kvsClient.load(TASK_KEY);
         String epicsJson = kvsClient.load(EPIC_KEY);
         String subtasksJson = kvsClient.load(SUBTASK_KEY);
@@ -67,19 +83,21 @@ public class HttpTaskManager extends FileBackedTasksManager {
         List<Task> allHistory = gson.fromJson(historyJson, taskListType);
 
         for (Task task: allTasks) {
-            this.tasks.put(task.getId(), task);
+            manager.tasks.put(task.getId(), task);
         }
 
         for (SubTask subTask : allSubTasks) {
-            this.subTasks.put(subTask.getId(), subTask);
+            manager.subTasks.put(subTask.getId(), subTask);
         }
 
         for (Epic epic : allEpics) {
-            this.epics.put(epic.getId(), epic);
+            manager.epics.put(epic.getId(), epic);
         }
 
         for (Task historyTask: allHistory) {
-            this.historyManager.addTask(historyTask);
+            manager.historyManager.addTask(historyTask);
         }
+
+        return manager;
     }
 }

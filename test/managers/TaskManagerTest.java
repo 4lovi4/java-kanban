@@ -1,5 +1,6 @@
 package managers;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	T taskManager;
 
 	@BeforeEach
-	public void prepareTest() {
+	public void setUp() throws IOException {
 		taskManager = getTaskManager();
 	}
 
