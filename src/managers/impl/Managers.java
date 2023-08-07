@@ -9,12 +9,17 @@ import managers.impl.InMemoryHistoryManager;
 import java.io.File;
 
 public class Managers {
+
+	private static final String KV_SERVER_URI = "http://localhost:8078";
+	private static final String TASKS_FILENAME = "server_tasks.csv";
+
+
 	public static TaskManager getDefault() {
-		return new HttpTaskManager("http://localhost:8078");
+		return new HttpTaskManager(KV_SERVER_URI);
 	}
 
 	public static TaskManager getFileBackedTaskManager() {
-		File taskFile = new File("server_tasks.csv");
+		File taskFile = new File(TASKS_FILENAME);
 		return new FileBackedTasksManager(taskFile);
 	}
 

@@ -7,14 +7,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class KvsTaskClient {
-    private int port = 8078;
-    private String host = "localhost";
+    private static final int DEFAULT_PORT = 8078;
+    private static final String DEFAULT_HOST = "localhost";
+
+    private int port;
+    private String host;
     private String uriStr;
     private String apiToken;
     HttpClient client;
 
     public KvsTaskClient() {
-        uriStr = String.format("http://%s:%d", host, port);
+        uriStr = String.format("http://%s:%d", DEFAULT_HOST, DEFAULT_PORT);
         apiToken = "DEBUG";
         client = HttpClient.newHttpClient();
     }

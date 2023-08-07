@@ -2,6 +2,7 @@ package managers.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import exception.KVServerConnectionException;
 import server.JsonAdapter;
 import server.KvsTaskClient;
 import tasks.Epic;
@@ -34,16 +35,16 @@ public class HttpTaskManager extends FileBackedTasksManager {
             kvsClient = new KvsTaskClient(port, host);
         }
         catch (RuntimeException e) {
-            throw new RuntimeException("Ошибка при создании клиента kv-сервера");
+            throw new KVServerConnectionException("Ошибка при создании клиента kv-сервера");
         }
     }
 
     @Override
     public void save() {
-        List<Task> allTasks = this.getAllTasks();
-        List<Epic> allEpics = this.getAllEpics();
-        List<SubTask> allSubTasks = this.getAllSubTasks();
-        List<Task> history = this.getHistory();
+        final List<Task> allTasks = this.getAllTasks();
+        final List<Epic> allEpics = this.getAllEpics();
+        final List<SubTask> allSubTasks = this.getAllSubTasks();
+        final List<Task> history = this.getHistory();
 
         String tasksJson = gson.toJson(allTasks);
         String epicsJson = gson.toJson(allEpics);
@@ -65,7 +66,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
             kvsClient = new KvsTaskClient();
         }
         catch (RuntimeException e) {
-            throw new RuntimeException("Ошибка при создании клиента kv-сервера");
+            throw new KVServerConnectionException("Ошибка при создании клиента kv-сервера");
         }
 
         String tasksJson = kvsClient.load(TASK_KEY);
