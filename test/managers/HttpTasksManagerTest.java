@@ -1,5 +1,6 @@
 package managers;
 
+import exception.KVServerConnectionException;
 import managers.impl.FileBackedTasksManager;
 import managers.impl.HttpTaskManager;
 import org.junit.jupiter.api.AfterEach;
@@ -134,6 +135,6 @@ class HttpTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
 
     @Test
     public void shouldThrowExceptionLoadingFromWrongServerUri() throws IOException{
-        assertThrows(RuntimeException.class, () -> loadFromServer("http://fail.server:9090"));
+        assertThrows(KVServerConnectionException.class, () -> loadFromServer("http://fail.server:9090"));
     }
 }

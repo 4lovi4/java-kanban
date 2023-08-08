@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class HttpTaskServer {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
-            String path = exchange.getRequestURI().getPath();
+            String path = exchange.getRequestURI().getRawPath();
             String query = exchange.getRequestURI().getRawQuery();
             InputStream stream = exchange.getRequestBody();
             String body = new String(stream.readAllBytes(), DEFAULT_CHARSET);
@@ -67,17 +68,8 @@ public class HttpTaskServer {
                     }
                 }
 
-                if (path.matches("^/tasks/task/?\\?id=\\d+$")) {
+                if (path.matches("^/tasks/task/?$") && query.matches("^id=\\d+$")) {
                     String[] queryIdParam = query.split("=");
-                    if (!queryIdParam[0].equals("id")) {
-                        byte[] message = "Неверный формат id задачи в запросе".getBytes();
-                        exchange.sendResponseHeaders(400, message.length);
-                        try (OutputStream os = exchange.getResponseBody()) {
-                            os.write(message);
-                            return;
-                        }
-                    }
-
                     int taskId = 0;
                     try {
                         taskId = Integer.parseInt(queryIdParam[1]);
@@ -103,17 +95,8 @@ public class HttpTaskServer {
                             os.write(taskPayload);
                         }
                     }
-                } else if (path.matches("^/tasks/epic/?\\?id=\\d+$")) {
+                } else if (path.matches("^/tasks/epic/?$") && query.matches("^id=\\d+$")) {
                     String[] queryIdParam = query.split("=");
-                    if (!queryIdParam[0].equals("id")) {
-                        byte[] message = "Неверный формат id эпика в запросе".getBytes();
-                        exchange.sendResponseHeaders(400, message.length);
-                        try (OutputStream os = exchange.getResponseBody()) {
-                            os.write(message);
-                            return;
-                        }
-                    }
-
                     int epicId = 0;
                     try {
                         epicId = Integer.parseInt(queryIdParam[1]);
@@ -139,17 +122,8 @@ public class HttpTaskServer {
                             os.write(epicPayload);
                         }
                     }
-                } else if (path.matches("^/tasks/subtask/?\\?id=\\d$")) {
+                } else if (path.matches("^/tasks/subtask/?$") && query.matches("^id=\\d+$")) {
                     String[] queryIdParam = query.split("=");
-                    if (!queryIdParam[0].equals("id")) {
-                        byte[] message = "Неверный формат id подзадачи в запросе".getBytes();
-                        exchange.sendResponseHeaders(400, message.length);
-                        try (OutputStream os = exchange.getResponseBody()) {
-                            os.write(message);
-                            return;
-                        }
-                    }
-
                     int subTaskId = 0;
                     try {
                         subTaskId = Integer.parseInt(queryIdParam[1]);
@@ -161,7 +135,7 @@ public class HttpTaskServer {
                             return;
                         }
                     }
-                    String taskData = getTaskById(TaskType.TASK, subTaskId);
+                    String taskData = getTaskById(TaskType.SUBTASK, subTaskId);
                     if (taskData.equals("")) {
                         byte[] message = String.format("Подзадача %d не найдена", subTaskId).getBytes();
                         exchange.sendResponseHeaders(404, message.length);
@@ -356,12 +330,13 @@ public class HttpTaskServer {
                         }
                     }
                     int taskId = createUpdateTask(taskData);
-                    exchange.sendResponseHeaders(204, Integer.toString(taskId).getBytes().length);
+                    byte[] data = Integer.toString(taskId).getBytes();
+                    exchange.sendResponseHeaders(201, data.length);
                     try (OutputStream os = exchange.getResponseBody()) {
-                        os.write(Integer.toString(taskId).getBytes());
+                        os.write(data);
                     }
                 }
-                else if (path.equals("^/tasks/subtask/?$")) {
+                else if (path.matches("^/tasks/subtask/?$")) {
                     SubTask subTaskData;
                     try {
                         subTaskData = gson.fromJson(body, SubTask.class);
@@ -374,9 +349,10 @@ public class HttpTaskServer {
                         }
                     }
                     int subTaskId = createUpdateTask(subTaskData);
-                    exchange.sendResponseHeaders(204, Integer.toString(subTaskId).getBytes().length);
+                    byte[] data = Integer.toString(subTaskId).getBytes();
+                    exchange.sendResponseHeaders(201, data.length);
                     try (OutputStream os = exchange.getResponseBody()) {
-                        os.write(Integer.toString(subTaskId).getBytes());
+                        os.write(data);
                     }
                 }
                 else if (path.matches("^/tasks/epic/?$")) {
@@ -392,9 +368,10 @@ public class HttpTaskServer {
                         }
                     }
                     int epicId = createUpdateTask(epicData);
-                    exchange.sendResponseHeaders(204, Integer.toString(epicId).getBytes().length);
+                    byte[] data = Integer.toString(epicId).getBytes();
+                    exchange.sendResponseHeaders(201, data.length);
                     try (OutputStream os = exchange.getResponseBody()) {
-                        os.write(Integer.toString(epicId).getBytes());
+                        os.write(data);
                     }
                 }
                 else {
