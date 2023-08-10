@@ -157,6 +157,26 @@ public class HttpTaskServer {
                         os.write(tasksPayload);
                     }
                 }
+                else if (path.matches("^/tasks/subtask/epic/?$") && query.matches("^id=\\d+$")) {
+                    String[] queryIdParam = query.split("=");
+                    int epicId = 0;
+                    try {
+                        epicId = Integer.parseInt(queryIdParam[1]);
+                    } catch (NumberFormatException | NullPointerException e) {
+                        byte[] message = "Неверный формат id эпика в запросе".getBytes();
+                        exchange.sendResponseHeaders(400, message.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(message);
+                            return;
+                        }
+                    }
+                    ArrayList<SubTask> subTasksByEpic = manager.getSubTasksByEpic(epicId);
+                    byte[] subTasksPayload = gson.toJson(subTasksByEpic).getBytes();
+                    exchange.sendResponseHeaders(200, subTasksPayload.length);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(subTasksPayload);
+                    }
+                }
                 else {
                     byte[] message = String.format("Задан неправильный endpoint GET %s", path).getBytes();
                     exchange.sendResponseHeaders(400, message.length);
@@ -166,11 +186,11 @@ public class HttpTaskServer {
                 }
             }
             if (method.equals("DELETE")) {
-                if (path.equals("^/tasks/task/?.*$")) {
+                if (path.matches("^/tasks/task/?$")) {
                     if (query.isEmpty()) {
                         deleteTasks(TaskType.TASK, -1);
                         byte[] message = "Все обычные задачи удалены".getBytes();
-                        exchange.sendResponseHeaders(204, message.length);
+                        exchange.sendResponseHeaders(200, message.length);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(message);
                         }
@@ -206,18 +226,18 @@ public class HttpTaskServer {
                         } else {
                             deleteTasks(TaskType.TASK, taskId);
                             byte[] message = String.format("Задача id = %d удалена", taskId).getBytes();
-                            exchange.sendResponseHeaders(204, message.length);
+                            exchange.sendResponseHeaders(200, message.length);
                             try (OutputStream os = exchange.getResponseBody()) {
                                 os.write(message);
                             }
                         }
                     }
                 }
-                else if (path.matches("^/tasks/subtask/?.*$")) {
+                else if (path.matches("^/tasks/subtask/?$")) {
                     if (query.isEmpty()) {
                         deleteTasks(TaskType.SUBTASK, -1);
                         byte[] message = "Все подзадачи удалены".getBytes();
-                        exchange.sendResponseHeaders(204, message.length);
+                        exchange.sendResponseHeaders(200, message.length);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(message);
                         }
@@ -253,7 +273,7 @@ public class HttpTaskServer {
                         } else {
                             deleteTasks(TaskType.SUBTASK, subTaskId);
                             byte[] message = String.format("Подзадача id = %d удалена", subTaskId).getBytes();
-                            exchange.sendResponseHeaders(204, message.length);
+                            exchange.sendResponseHeaders(200, message.length);
                             try (OutputStream os = exchange.getResponseBody()) {
                                 os.write(message);
                             }
@@ -264,7 +284,7 @@ public class HttpTaskServer {
                     if (query.isEmpty()) {
                         deleteTasks(TaskType.EPIC, -1);
                         byte[] message = "Все эпики удалены".getBytes();
-                        exchange.sendResponseHeaders(204, message.length);
+                        exchange.sendResponseHeaders(200, message.length);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(message);
                         }
@@ -300,7 +320,7 @@ public class HttpTaskServer {
                         } else {
                             deleteTasks(TaskType.TASK, epicId);
                             byte[] message = String.format("Эпик id = %d удален", epicId).getBytes();
-                            exchange.sendResponseHeaders(204, message.length);
+                            exchange.sendResponseHeaders(200, message.length);
                             try (OutputStream os = exchange.getResponseBody()) {
                                 os.write(message);
                             }
