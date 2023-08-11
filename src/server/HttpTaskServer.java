@@ -110,7 +110,7 @@ public class HttpTaskServer {
                     }
                     String taskData = getTaskById(TaskType.EPIC, epicId);
                     if (taskData.equals("")) {
-                        byte[] message = String.format("Эпик %d не найдена", epicId).getBytes();
+                        byte[] message = String.format("Эпик %d не найден", epicId).getBytes();
                         exchange.sendResponseHeaders(404, message.length);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(message);
@@ -280,7 +280,7 @@ public class HttpTaskServer {
                         }
                     }
                 }
-                else if (path.matches("^/tasks/epic/?.*$")) {
+                else if (path.matches("^/tasks/epic/?$")) {
                     if (query.isEmpty()) {
                         deleteTasks(TaskType.EPIC, -1);
                         byte[] message = "Все эпики удалены".getBytes();
