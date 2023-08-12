@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import managers.impl.FileBackedTasksManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
@@ -75,6 +76,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Сохранение всех задач в файл")
     public void shouldSaveTasksAllTypesInFileCorrectly() throws IOException {
         Task task = createNewTask(100);
         int taskId = taskManager.addNewTask(task);
@@ -94,6 +96,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Сохранение всех задач с заданным временем и длительностью в файл")
     public void shouldSaveTasksAllTypesInFileCorrectlyWithTime() throws IOException {
         Task task = createNewTask(100);
         int taskId = taskManager.addNewTask(task);
@@ -118,6 +121,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Сохранение пустого списка задач в файл")
     public void shouldSaveEmptyTasksInFile() throws IOException {
         String fileContentExpected = "id,type,name,status,description,epic,start_time,duration,end_time\n\n";
         assertDoesNotThrow(() -> taskManager.save());
@@ -128,6 +132,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Загрузка задач из пустого файла")
     public void shouldLoadTasksFromFileWithEmptyHistory() throws IOException {
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
         String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,,,,\n";
@@ -152,6 +157,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Загрузка задач и истории запросов из файла")
     public void shouldLoadTasksFromFileWithHistory() throws IOException {
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
         String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,,,,\n";
@@ -177,6 +183,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Загрузка задач и истории запросов с указанным временем из файла")
     public void shouldLoadTasksFromFileWithTime() throws IOException {
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
         String taskText = "150,TASK,Загрузка Задачи,DONE,Описание загрузки задачи,,2023-06-24T18:00:00,30,2023-06-24T18:30:00\n";
@@ -202,6 +209,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Загрузка задач из пустого файла только с заголовком")
     public void shouldLoadEmptyTasksAllTypesFromFileWithOnlyCsvHeader() throws IOException{
         String headerText = "id,type,name,status,description,epic,start_time,duration,end_time\n";
         try (FileWriter writer = new FileWriter(TEST_FILENAME, false)) {
@@ -214,6 +222,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Загрузка пустых списков задач из пустого файла")
     public void shouldLoadEmptyTasksAllTypesFromEmptyFile() throws IOException{
         FileBackedTasksManager manager = loadFromFile(new File(EMPTY_TEST_FILENAME));
         assertTrue(manager.getAllTasks().isEmpty(), "Список задач не пустой");
@@ -222,6 +231,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
+    @DisplayName("Исключениеесли указано неправльное имя файла")
     public void shouldThrowExceptionLoadingFromNonExistingFile() throws IOException{
         assertThrows(ManagerSaveException.class, () -> loadFromFile(new File(NON_EXISTING_FILENAME)));
     }

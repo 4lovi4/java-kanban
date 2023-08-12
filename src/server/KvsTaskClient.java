@@ -1,5 +1,7 @@
 package server;
 
+import exception.KVServerConnectionException;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -33,7 +35,7 @@ public class KvsTaskClient {
             HttpResponse<String> registerResponse = client.send(registerRequest, HttpResponse.BodyHandlers.ofString());
             apiToken = registerResponse.body();
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Ошибка клиента в запросе GET /register");
+            throw new KVServerConnectionException("Ошибка клиента в запросе GET /register");
         }
     }
 
@@ -44,7 +46,7 @@ public class KvsTaskClient {
             HttpResponse<String> saveResponse = client.send(saveRequest, HttpResponse.BodyHandlers.ofString());
         }
         catch (IOException | InterruptedException e) {
-            throw new RuntimeException(String.format("Ошибка при сохранении на сервере по ключу %s", key));
+            throw new KVServerConnectionException(String.format("Ошибка при сохранении на сервере по ключу %s", key));
         }
     }
 
@@ -57,7 +59,7 @@ public class KvsTaskClient {
             responseValue = loadResponse.body();
         }
         catch (IOException | InterruptedException e) {
-            throw new RuntimeException(String.format("Ошибка при сохранении на сервере по ключу %s", key));
+            throw new KVServerConnectionException(String.format("Ошибка при сохранении на сервере по ключу %s", key));
         }
         return responseValue;
     }

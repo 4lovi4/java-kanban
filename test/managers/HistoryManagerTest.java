@@ -2,6 +2,7 @@ package managers;
 
 import managers.impl.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.SubTask;
@@ -24,6 +25,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Добавление задачи в историю")
 	public void shouldAddTaskToHistory() {
 		Task task = new Task(100, "Задача в Истории", "NEW", "Эту задачу добавим в историю");
 		manager.addTask(task);
@@ -33,6 +35,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Добавление уже имеющейся задачи в историю")
 	public void shouldRenewAddedTaskWithExistedIdToHistory() {
 		Task task1 = new Task(100, "Первая задача", "NEW", "Эту задачу добавим в историю");
 		Task task2 = new Task(100, "Вторая задача", "DONE", "Эту задачу добавим в историю");
@@ -43,6 +46,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Добавление эпика без подзадач в историю")
 	public void shouldAddEpicWithoutSubtasksToHistory() {
 		Epic epic = new Epic(100, "Эпик в Истории", "NEW", "Этот эпик добавим в историю");
 		manager.addTask(epic);
@@ -52,6 +56,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Добавление эпика с подзадачами в историю")
 	public void shouldAddEpicWithSubtasksToHistory() {
 		Epic epic = new Epic(100, "Эпик в Истории", "NEW", "Этот эпик добавим в историю");
 		epic.addSubTaskId(1000);
@@ -62,6 +67,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Добавление подзадачи в историю")
 	public void shouldAddSubTaskToHistory() {
 		SubTask subTask = new SubTask(1000, "Подзадача в Истории", "NEW", "Эту подзадачу добавим в историю", 100);
 		manager.addTask(subTask);
@@ -71,6 +77,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Удаленение задачи из историю")
 	public void shouldRemoveTaskFromHistory() {
 		Task task = new Task(100, "Задача в Истории", "NEW", "Эту задачу добавим в историю");
 		manager.addTask(task);
@@ -81,6 +88,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Не выбрасывать исключение при удалении задачи с неправильным id")
 	public void shouldNotThrowExceptionOnRemoveWrongTaskIdFromHistory() {
 		Task task = new Task(100, "Задача в Истории", "NEW", "Эту задачу добавим в историю");
 		manager.addTask(task);
@@ -92,6 +100,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Не выбрасывать исключение при удалении задачи из пустого списка")
 	public void shouldNotThrowExceptionOnRemoveFromEmptyHistory() {
 		int taskId = 1000;
 		assertTrue(manager.getHistory().isEmpty(), "История задач не пустая");
@@ -99,6 +108,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Удаление эпика из истории")
 	public void shouldRemoveEpicFromHistory() {
 		Epic epic = new Epic(100, "Эпик в Истории", "NEW", "Этот эпик добавим в историю");
 		epic.addSubTaskId(1000);
@@ -110,6 +120,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Удаление подзадачи из истории")
 	public void shouldRemoveSubTaskFromHistory() {
 		SubTask subTask = new SubTask(1000, "Подзадача в Истории", "NEW", "Эту подзадачу добавим в историю", 100);
 		manager.addTask(subTask);
@@ -120,6 +131,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Получение истории")
 	public void shouldReturnHistory() {
 		Task task = new Task(10, "Задача в Истории", "NEW", "Эту задачу добавим в историю");
 		Epic epic = new Epic(100, "Эпик в Истории", "NEW", "Этот эпик добавим в историю");
@@ -133,6 +145,7 @@ class HistoryManagerTest {
 	}
 
 	@Test
+	@DisplayName("Получение пустой истории")
 	public void shouldReturnEmptyHistory() {
 		assertTrue(manager.getHistory().isEmpty(), "История не пустая");
 	}

@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import managers.impl.HttpTaskManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
@@ -19,7 +22,6 @@ import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,11 +30,9 @@ class HttpTaskServerTest {
 
     private static final String TASK_SERVER_URI = "http://localhost:8080";
     private static final String KVSERVER_URI = "http://localhost:8078";
-
     private KVServer kvServer;
     private HttpTaskServer taskServer;
     private HttpClient taskManagerClient;
-    private HttpTaskManager manager;
     private Gson gson;
     private Type taskListType;
 
@@ -41,7 +41,7 @@ class HttpTaskServerTest {
     void setUp() throws IOException {
         kvServer = new KVServer();
         kvServer.start();
-        manager = new HttpTaskManager(KVSERVER_URI);
+        HttpTaskManager manager = new HttpTaskManager(KVSERVER_URI);
         taskServer = new HttpTaskServer(manager);
         taskServer.start();
         taskManagerClient = HttpClient.newHttpClient();
@@ -94,7 +94,7 @@ class HttpTaskServerTest {
         } catch (IOException | InterruptedException e) {
             fail(String.format("Ошибка при вызове GET /tasks/task/?id=%d", taskId));
         } catch (JsonSyntaxException e) {
-            fail(String.format("Ошибка при десериализации объекта типа Task"));
+            fail("Ошибка при десериализации объекта типа Task");
         }
     }
 
@@ -168,7 +168,7 @@ class HttpTaskServerTest {
         } catch (IOException | InterruptedException e) {
             fail(String.format("Ошибка при вызове GET /tasks/subtask/?id=%d", subTaskId));
         } catch (JsonSyntaxException e) {
-            fail(String.format("Ошибка при десериализации объекта типа SubTask"));
+            fail("Ошибка при десериализации объекта типа SubTask");
         }
     }
 
@@ -218,7 +218,7 @@ class HttpTaskServerTest {
         } catch (IOException | InterruptedException e) {
             fail(String.format("Ошибка при вызове GET /tasks/epic/?id=%d", epicId));
         } catch (JsonSyntaxException e) {
-            fail(String.format("Ошибка при десериализации объекта типа Epic"));
+            fail("Ошибка при десериализации объекта типа Epic");
         }
     }
 
@@ -264,7 +264,7 @@ class HttpTaskServerTest {
         } catch (IOException | InterruptedException e) {
             fail(String.format("Ошибка при вызове DELETE /tasks/task/?id=%d", taskId));
         } catch (JsonSyntaxException e) {
-            fail(String.format("Ошибка при удалении объекта типа Task"));
+            fail("Ошибка при удалении объекта типа Task");
         }
 
         URI uriGetTask = URI.create(TASK_SERVER_URI + "/tasks/task/" + String.format("?id=%d", taskId));
@@ -320,7 +320,7 @@ class HttpTaskServerTest {
         } catch (IOException | InterruptedException e) {
             fail(String.format("Ошибка при вызове DELETE /tasks/epic/?id=%d", epicId));
         } catch (JsonSyntaxException e) {
-            fail(String.format("Ошибка при удалении объекта типа Epic"));
+            fail("Ошибка при удалении объекта типа Epic");
         }
 
         URI uriGetTask = URI.create(TASK_SERVER_URI + "/tasks/epic/" + String.format("?id=%d", epicId));
@@ -379,7 +379,7 @@ class HttpTaskServerTest {
         } catch (IOException | InterruptedException e) {
             fail(String.format("Ошибка при вызове DELETE /tasks/subtask/?id=%d", subTaskId));
         } catch (JsonSyntaxException e) {
-            fail(String.format("Ошибка при удалении объекта типа SubTask"));
+            fail("Ошибка при удалении объекта типа SubTask");
         }
 
         URI uriGetSubTask = URI.create(TASK_SERVER_URI + "/tasks/subtask/" + String.format("?id=%d", subTaskId));
@@ -501,15 +501,15 @@ class HttpTaskServerTest {
             int finalEpicId = epicId;
             int finalTaskId = taskId;
             int finalSubTaskId = subTaskId;
-            assertAll( () -> assertTrue(allTasksFromServer.stream().map(t -> t.getId())
+            assertAll( () -> assertTrue(allTasksFromServer.stream().map(Task::getId)
                             .collect(Collectors
-                                    .toSet()).contains(Integer.valueOf(finalEpicId))),
-                    () ->  assertTrue(allTasksFromServer.stream().map(t -> t.getId())
+                                    .toSet()).contains(finalEpicId)),
+                    () ->  assertTrue(allTasksFromServer.stream().map(Task::getId)
                             .collect(Collectors
-                                    .toSet()).contains(Integer.valueOf(finalTaskId))),
-                    () -> assertTrue(allTasksFromServer.stream().map(t -> t.getId())
+                                    .toSet()).contains(finalTaskId)),
+                    () -> assertTrue(allTasksFromServer.stream().map(Task::getId)
                             .collect(Collectors
-                                    .toSet()).contains(Integer.valueOf(finalSubTaskId)))
+                                    .toSet()).contains(finalSubTaskId))
             );
         } catch (IOException | InterruptedException e) {
             fail("Ошибка при вызове GET /tasks/");
@@ -533,6 +533,187 @@ class HttpTaskServerTest {
         }
         catch (IOException | InterruptedException e) {
             fail("Ошибка при вызове GET /tasks/");
+        }
+    }
+
+    @Test
+    @DisplayName("Получение истории запроса всех задач методом GET /tasks/history")
+    public void shouldGetAllHistoryFromServer() throws InterruptedException {
+        int subTaskId = 0;
+        int epicId = 0;
+        int taskId = 0;
+        URI uriCreateTask = URI.create(TASK_SERVER_URI + "/tasks/task");
+        URI uriCreateSubTask = URI.create(TASK_SERVER_URI + "/tasks/subtask");
+        URI uriCreateEpic = URI.create(TASK_SERVER_URI + "/tasks/epic");
+
+        Task task = new Task(taskId,
+                "Задача",
+                Status.DONE.name(),
+                "Описание",
+                LocalDateTime.now().minusHours(3L),
+                90L);
+        Epic epic = new Epic(epicId,
+                "Эпичная задача",
+                Status.NEW.name(),
+                "Описание");
+        SubTask subTask = new SubTask(subTaskId,
+                "Подзадача",
+                Status.IN_PROGRESS.name(),
+                "Описание",
+                epicId,
+                LocalDateTime.now().minusDays(1L),
+                120L);
+
+        try {
+            String epicJson = gson.toJson(epic, Epic.class);
+            HttpRequest epicPostRequest = HttpRequest.newBuilder()
+                    .uri(uriCreateEpic)
+                    .POST(HttpRequest.BodyPublishers.ofString(epicJson))
+                    .build();
+            HttpResponse<String> epicPostResponse = taskManagerClient
+                    .send(epicPostRequest, HttpResponse.BodyHandlers.ofString());
+            epicId = Integer.parseInt(epicPostResponse.body());
+        }
+        catch (IOException | InterruptedException e) {
+            fail("Ошибка при вызове добавления новых задач типа Epic");
+            return;
+        } catch (NumberFormatException e) {
+            fail("Ошибка: в ответе методов создания эпика получено не число типа int");
+            return;
+        }
+
+        Thread.sleep(1000L);
+
+        try {
+            String taskJson = gson.toJson(task, Task.class);
+            HttpRequest taskPostRequest = HttpRequest.newBuilder()
+                    .uri(uriCreateTask)
+                    .POST(HttpRequest.BodyPublishers.ofString(taskJson))
+                    .build();
+            HttpResponse<String> taskPostResponse = taskManagerClient
+                    .send(taskPostRequest, HttpResponse.BodyHandlers.ofString());
+            taskId = Integer.parseInt(taskPostResponse.body());
+        }
+        catch (IOException | InterruptedException e) {
+            fail("Ошибка при вызове добавления новых задач типа Task");
+            return;
+        } catch (NumberFormatException e) {
+            fail("Ошибка: в ответе методов создания задачи получено не число типа int");
+            return;
+        }
+
+        Thread.sleep(1000L);
+
+        subTask.setEpicId(epicId);
+
+        try {
+            String subTaskJson = gson.toJson(subTask, SubTask.class);
+            HttpRequest subTaskPostRequest = HttpRequest.newBuilder()
+                    .uri(uriCreateSubTask)
+                    .POST(HttpRequest.BodyPublishers.ofString(subTaskJson))
+                    .build();
+            HttpResponse<String> subTaskPostResponse = taskManagerClient
+                    .send(subTaskPostRequest, HttpResponse.BodyHandlers.ofString());
+            subTaskId = Integer.parseInt(subTaskPostResponse.body());
+        }
+        catch (IOException | InterruptedException e) {
+            fail("Ошибка при вызове добавления новых задач типа SubTask");
+            return;
+        } catch (NumberFormatException e) {
+            fail("Ошибка: в ответе методов создания подзадачи получено не число типа int");
+            return;
+        }
+
+        task.setId(taskId);
+        epic.setId(epicId);
+        subTask.setId(subTaskId);
+
+        URI uriGetTask = URI.create(TASK_SERVER_URI + "/tasks/task" + String.format("?id=%d", taskId));
+        URI uriGetSubTask = URI.create(TASK_SERVER_URI + "/tasks/subtask" + String.format("?id=%d", subTaskId));
+        URI uriGetEpic = URI.create(TASK_SERVER_URI + "/tasks/epic" + String.format("?id=%d", epicId));
+
+        try {
+            HttpRequest epicGetRequest = HttpRequest.newBuilder()
+                    .uri(uriGetEpic)
+                    .GET()
+                    .build();
+            taskManagerClient.send(epicGetRequest, HttpResponse.BodyHandlers.ofString());
+        }
+        catch (IOException | InterruptedException e) {
+            fail(String.format("Ошибка при получении задачи %d типа Epic", epicId));
+            return;
+        }
+
+        try {
+            HttpRequest taskGetRequest = HttpRequest.newBuilder()
+                    .uri(uriGetTask)
+                    .GET()
+                    .build();
+            taskManagerClient.send(taskGetRequest, HttpResponse.BodyHandlers.ofString());
+        }
+        catch (IOException | InterruptedException e) {
+            fail(String.format("Ошибка при получении задачи %d типа Task", taskId));
+            return;
+        }
+
+        try {
+            HttpRequest subTaskGetRequest = HttpRequest.newBuilder()
+                    .uri(uriGetSubTask)
+                    .GET()
+                    .build();
+            taskManagerClient.send(subTaskGetRequest, HttpResponse.BodyHandlers.ofString());
+        }
+        catch (IOException | InterruptedException e) {
+            fail(String.format("Ошибка при получении задачи %d типа SubTask", subTaskId));
+            return;
+        }
+
+        try {
+            URI uriGetHistory = URI.create(TASK_SERVER_URI + "/tasks/history");
+            HttpRequest historyGetRequest = HttpRequest.newBuilder()
+                    .uri(uriGetHistory)
+                    .GET()
+                    .build();
+            HttpResponse<String> historyGetResponse = taskManagerClient
+                    .send(historyGetRequest, HttpResponse.BodyHandlers.ofString());
+            assertEquals(200, historyGetResponse.statusCode());
+            List<Task> historyFromServer = gson.fromJson(historyGetResponse.body(), taskListType);
+
+            assertEquals(3, historyFromServer.size());
+            int finalEpicId = epicId;
+            int finalTaskId = taskId;
+            int finalSubTaskId = subTaskId;
+            assertAll( () -> assertTrue(historyFromServer.stream().map(Task::getId)
+                            .collect(Collectors
+                                    .toSet()).contains(finalEpicId)),
+                    () ->  assertTrue(historyFromServer.stream().map(Task::getId)
+                            .collect(Collectors
+                                    .toSet()).contains(finalTaskId)),
+                    () -> assertTrue(historyFromServer.stream().map(Task::getId)
+                            .collect(Collectors
+                                    .toSet()).contains(finalSubTaskId))
+            );
+        } catch (IOException | InterruptedException e) {
+            fail("Ошибка при вызове GET /tasks/history");
+        }
+    }
+
+    @Test
+    @DisplayName("Получение пустого списка истории GET /tasks/history")
+    public void getEmptyHistory() {
+        URI uriGetHistory = URI.create(TASK_SERVER_URI + "/tasks/history");
+        HttpRequest historyGetRequest = HttpRequest.newBuilder()
+                .uri(uriGetHistory)
+                .GET()
+                .build();
+        try {
+            HttpResponse<String> historyGetResponse = taskManagerClient
+                    .send(historyGetRequest, HttpResponse.BodyHandlers.ofString());
+            assertEquals(200, historyGetResponse.statusCode());
+            List<Task> historyFromServer = gson.fromJson(historyGetResponse.body(), taskListType);
+            assertTrue(historyFromServer.isEmpty());
+        } catch (IOException | InterruptedException e) {
+            fail("Ошибка при вызове GET /tasks/history");
         }
     }
 }

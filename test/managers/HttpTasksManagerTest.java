@@ -5,6 +5,7 @@ import managers.impl.FileBackedTasksManager;
 import managers.impl.HttpTaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.KVServer;
 import server.KvsTaskClient;
@@ -42,6 +43,7 @@ class HttpTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     }
 
     @Test
+    @DisplayName("Сохранение задач типа Task на сервере")
     public void shouldSaveAllTasksToServerCorrectly() {
         Task task = createNewTask(100);
         LocalDateTime startTime = LocalDateTime.now().minusDays(1L);
@@ -59,6 +61,7 @@ class HttpTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     }
 
     @Test
+    @DisplayName("Сохранение задач типа Epic на сервере")
     public void shouldSaveAllEpicsToServerCorrectly() {
         LocalDateTime startTime = LocalDateTime.now().minusDays(1L);
         Long duration = 60L;
@@ -81,6 +84,7 @@ class HttpTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     }
 
     @Test
+    @DisplayName("Сохранение подзадач типа SubTask на сервере")
     public void shouldSaveAllSubTasksToServerCorrectly() {
         LocalDateTime startTime = LocalDateTime.now().minusDays(1L);
         Long duration = 60L;
@@ -102,6 +106,7 @@ class HttpTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     }
 
     @Test
+    @DisplayName("Сохранение истории запроса задач на сервере")
     public void shouldSaveAllHistoryToServerCorrectly() {
         Task task = createNewTask(1);
         Epic epic = createNewEpic(50);
@@ -134,7 +139,8 @@ class HttpTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     }
 
     @Test
-    public void shouldThrowExceptionLoadingFromWrongServerUri() throws IOException{
+    @DisplayName("Исключение KVServerConnectionException при неправильном адресе KV сервера")
+    public void shouldThrowExceptionLoadingFromWrongServerUri() throws KVServerConnectionException{
         assertThrows(KVServerConnectionException.class, () -> loadFromServer("http://fail.server:9090"));
     }
 }

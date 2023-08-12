@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
@@ -51,6 +52,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Эпик без подзадач имеет статус NEW")
 	public void shouldReturnEpicNewStatusForEmptySubTasks() {
 		Epic epic = createNewEpic(1);
 		assertTrue(epic.getSubTasksId().isEmpty(), "Список id подзадач не пустой");
@@ -58,6 +60,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Эпик со всеми подзадачами в статусе NEW сам имеет статус NEW")
 	public void shouldReturnEpicNewStatusForAllNewSubTasks() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -71,6 +74,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Эпик со всеми подзадачами в статусе DONE сам имеет статус DONE")
 	public void shouldReturnEpicDoneStatusForAllDoneSubTasks() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -84,6 +88,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Эпик с подзадачами в статусе DONE и NEW сам имеет статус IN_PROGRESS")
 	public void shouldReturnEpicInProgressStatusForDoneAndNewSubTasks() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -97,6 +102,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Эпик со всеми подзадачами в статусе IN_PROGRESS сам имеет статус IN_PROGRESS")
 	public void shouldReturnEpicInProgressStatusForAllInProgressSubTasks() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -110,6 +116,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Эпик с подзадачами в статусе IN_PROGRESS и NEW сам имеет статус IN_PROGRESS")
 	public void shouldReturnEpicInProgressStatusForNewAndInProgressSubTasks() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -123,6 +130,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение списка всех задач типа Task")
 	public void shouldGetAllTasksList() {
 		Task task1 = createNewTask(1);
 		Task task2 = createNewTask(2);
@@ -138,6 +146,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение пустого списка всех задач типа Task")
 	public void shouldGetAllTasksEmptyList() {
 		List<Task> allTasks = taskManager.getAllTasks();
 		assertNotNull(allTasks);
@@ -145,6 +154,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение списка всех задач типа Epic")
 	public void shouldGetAllEpicsList() {
 		Epic epic1 = createNewEpic(1);
 		Epic epic2 = createNewEpic(2);
@@ -160,6 +170,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение пустого списка всех задач типа Epic")
 	public void shouldGetAllEpicsEmptyList() {
 		List<Epic> allEpics = taskManager.getAllEpics();
 		assertNotNull(allEpics);
@@ -167,6 +178,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение списка всех подзадач типа SubTask")
 	public void shouldGetAllSubTasksList() {
 		SubTask subTask1 = createSubTask(1, 0);
 		SubTask subTask2 = createSubTask(2, 0);
@@ -182,6 +194,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение пустого списка подзадач типа SubTask")
 	public void shouldGetAllSubTasksEmptyList() {
 		List<SubTask> allSubTasks = taskManager.getAllSubTasks();
 		assertNotNull(allSubTasks);
@@ -189,6 +202,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Добавление и получение задачи типа Task по id")
 	public void shouldAddAndGetNewTask() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
@@ -199,6 +213,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Добавление и получение задачи типа Epic по id")
 	public void shouldAddAndGetNewEpic() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -209,6 +224,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Добавление и получение подзадачи типа SubTask по id")
 	public void shouldAddAndGetNewSubTask() {
 		SubTask subTask = createSubTask(1, 0);
 		int subTaskId = taskManager.addNewSubTask(subTask);
@@ -219,6 +235,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение подзадачи SubTask по id Epic")
 	public void shouldGetSubTasksByEpicId() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -230,6 +247,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение null при запросе Task с неправильным id")
 	public void ShouldGetNullOnWrongTaskId() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
@@ -239,6 +257,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение null при запросе Epic с неправильным id")
 	public void ShouldGetNullOnWrongEpicId() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -248,6 +267,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение null при запросе SubTask с неправильным id")
 	public void ShouldGetNullOnWrongSubTaskId() {
 		SubTask subTask = createSubTask(1, 0);
 		int subTaskId = taskManager.addNewSubTask(subTask);
@@ -257,6 +277,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение null при пустом списке задач Task")
 	public void ShouldGetNullOnEmptyTasksList() {
 		int taskId = 1;
 		assertTrue(taskManager.getAllTasks().isEmpty());
@@ -264,6 +285,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение null при пустом списке задач Epic")
 	public void ShouldGetNullOnEmptyEpicsList() {
 		int epicId = 1;
 		assertTrue(taskManager.getAllEpics().isEmpty());
@@ -271,6 +293,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получение null при пустом списке подзадач subTask")
 	public void ShouldGetNullOnEmptySubTasksList() {
 		int subTaskId = 1;
 		assertTrue(taskManager.getAllSubTasks().isEmpty());
@@ -279,6 +302,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
 
 	@Test
+	@DisplayName("Обновление задачи Task")
 	public void shouldUpdateTask() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
@@ -295,6 +319,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не обновляется задача Task с неправильным id")
 	public void shouldNotUpdateWrongTask() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
@@ -310,6 +335,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не обновляется задача Task при пустом списке задач")
 	public void shouldNotUpdateEmptyTasksList() {
 		Task task = createNewTask(1);
 		task.setStatus(Status.DONE);
@@ -318,6 +344,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Обновление подзадачи SubTask")
 	public void shouldUpdateSubTask() {
 		Epic epic1 = createNewEpic(1);
 		Epic epic2 = createNewEpic(2);
@@ -338,6 +365,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не обновляется подзадача SubTask с неправильным id")
 	public void shouldNotUpdateWrongSubTask() {
 		Epic epic1 = createNewEpic(1);
 		Epic epic2 = createNewEpic(2);
@@ -358,6 +386,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не обновляется подзадача SubTask при пустом списке задач")
 	public void shouldNotUpdateEmptySubTasksList() {
 		SubTask subTask = createSubTask(1, 1);
 		subTask.setStatus(Status.DONE);
@@ -366,6 +395,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Обновление задачи Epic")
 	public void shouldUpdateEpic() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -385,6 +415,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не обновляется задача Epic с неправильным id")
 	public void shouldNotUpdateWrongEpic() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -404,6 +435,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не обновляется задача Epic при пустом списке задач")
 	public void shouldNotUpdateEmptyEpicList() {
 		Epic epic = createNewEpic(1);
 		epic.setStatus(Status.DONE);
@@ -412,6 +444,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление задачи Task")
 	public void shouldDeleteTask() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
@@ -421,6 +454,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не удаляется задача Task с неправильным id")
 	public void shouldNotDeleteTaskWithWrongId() {
 		Task task = createNewTask(1);
 		int taskId = taskManager.addNewTask(task);
@@ -431,6 +465,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не выбрасывается исключение при удалении задачи Task из пустого списка")
 	public void shouldNotInvokeExceptionForDeleteTaskFromEmptyList() {
 		int taskId = 1;
 		assertTrue(taskManager.getAllTasks().isEmpty());
@@ -438,6 +473,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление задачи Epic")
 	public void shouldDeleteEpic() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -447,6 +483,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление задачи Epic с подзадачами")
 	public void shouldDeleteEpicWithSubTask() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -463,6 +500,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
 
 	@Test
+	@DisplayName("Не удаляется задача Epic с неправильным id")
 	public void shouldNotDeleteEpicWithWrongId() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -473,6 +511,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не выбрасывается исключение при удалении задачи Epic из пустого списка")
 	public void shouldNotInvokeExceptionForDeleteEpicFromEmptyList() {
 		int epicId = 1;
 		assertTrue(taskManager.getAllEpics().isEmpty());
@@ -481,6 +520,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
 
 	@Test
+	@DisplayName("Удаление подзадачи SubTask")
 	public void shouldDeleteSubTask() {
 		SubTask subTask = createSubTask(1, 1);
 		int subTaskId = taskManager.addNewSubTask(subTask);
@@ -490,6 +530,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление подзадачи SubTask из эпика")
 	public void shouldDeleteSubTaskFromEpic() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -504,6 +545,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не удаляется подзадача SubTask с неправильным id")
 	public void shouldNotDeleteSubTaskWithWrongId() {
 		SubTask subTask = createSubTask(1, 1);
 		int subTaskId = taskManager.addNewSubTask(subTask);
@@ -514,6 +556,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Не выбрасывается исключение при удалении подзадачи SubTask из пустого списка")
 	public void shouldNotInvokeExceptionForDeleteSubTaskFromEmptyList() {
 		int subTaskId = 1;
 		assertTrue(taskManager.getAllSubTasks().isEmpty());
@@ -521,6 +564,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление всех задач Task")
 	public void shouldDeleteAllTasks() {
 		Task task = createNewTask(1);
 		taskManager.addNewTask(task);
@@ -529,12 +573,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление всех задач Task при пустом списке")
 	public void shouldDeleteAllTasksWithEmptyTaskList() {
 		assertDoesNotThrow(() -> taskManager.deleteAllTasks());
 		assertTrue(taskManager.getAllTasks().isEmpty(), "Список задач не пустой после удаления всех задач");
 	}
 
 	@Test
+	@DisplayName("Удаление всех задач Epic")
 	public void shouldDeleteAllEpics() {
 		Epic epic = createNewEpic(1);
 		taskManager.addNewEpic(epic);
@@ -543,12 +589,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление всех задач Epic при пустом списке")
 	public void shouldDeleteAllEpicsWithEmptyEpicList() {
 		assertDoesNotThrow(() -> taskManager.deleteAllEpics());
 		assertTrue(taskManager.getAllEpics().isEmpty(), "Список эпиков не пустой после удаления всех эпиков");
 	}
 
 	@Test
+	@DisplayName("Удаление всех подзадач SubTask")
 	public void shouldDeleteAllSubTasks() {
 		SubTask subTask = createSubTask(1, 1);
 		taskManager.addNewSubTask(subTask);
@@ -557,12 +605,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Удаление всех подзадач SubTask при пустом списке")
 	public void shouldDeleteAllSubTasksWithEmptySubTaskList() {
 		assertDoesNotThrow(() -> taskManager.deleteAllSubTasks());
 		assertTrue(taskManager.getAllSubTasks().isEmpty(), "Список подзадач не пустой после удаления всех подзадач");
 	}
 
 	@Test
+	@DisplayName("Установка времени начала задачи")
 	public void shouldSetAndReturnTaskStartTime() {
 		Task task = createNewTask(1);
 		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
@@ -573,6 +623,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Установка длительности задачи")
 	public void shouldSetAndReturnTaskDuration() {
 		Task task = createNewTask(1);
 		Long durationToSet = 100L;
@@ -583,6 +634,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 	
 	@Test
+	@DisplayName("Получение времени окончания задачи")
 	public void shouldReturnTaskCorrectEndTime() {
 		Task task = createNewTask(1);
 		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
@@ -596,22 +648,25 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Нельзя получить время окончания задачи если не установлено время начала")
 	public void shouldReturnNullEndTimeIfStartTimeNotSet() {
 		Task task = createNewTask(1);
-		assertDoesNotThrow(() -> task.getEndTime());
+		assertDoesNotThrow(task::getEndTime);
 		assertNull(task.getEndTime(), "Время окончания задачи не Null");
 	}
 
 	@Test
+	@DisplayName("Нельзя получить время окончания задачи если не установлена длительность")
 	public void shouldReturnNullEndTimeIfDurationNotSet() {
 		Task task = createNewTask(1);
 		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
 		task.setStartTime(startTimeToSet);
-		assertDoesNotThrow(() -> task.getEndTime());
+		assertDoesNotThrow(task::getEndTime);
 		assertNull(task.getEndTime(), "Время окончания задачи не Null");
 	}
 
 	@Test
+	@DisplayName("Получение времени окончания подзадачи SubTask")
 	public void shouldReturnSubTaskCorrectEndTime() {
 		SubTask subTask = createSubTask(1, 10);
 		LocalDateTime startTimeToSet = (LocalDateTime.of(2023, 6, 24, 12, 0, 0));
@@ -625,6 +680,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Вычисление времени окончания эпика Epic по времени подзадач")
 	public void shouldCalculateEpicEndTimeAndDuration() {
 		Epic epic = createNewEpic(1);
 		int epicId = taskManager.addNewEpic(epic);
@@ -650,6 +706,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 	}
 
 	@Test
+	@DisplayName("Получениен списка задач приоритезированного по времени")
 	public void shouldGetPrioritizedByStartTimeTasks() {
 		Task taskWithTime = createNewTask(1);
 		LocalDateTime startTime1 = LocalDateTime.of(2023, 6, 24, 12, 0);
