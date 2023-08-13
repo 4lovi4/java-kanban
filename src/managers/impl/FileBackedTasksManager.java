@@ -126,7 +126,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return epic;
     }
 
-    public void save() throws ManagerSaveException {
+    public void save() {
         List<Task> allTasks = getAllTasks();
         List<Epic> allEpics = getAllEpics();
         List<SubTask> allSubTasks = getAllSubTasks();
@@ -196,6 +196,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private String toString(Task task) {
+        String taskString = "";
         TaskType taskType = TaskType.TASK;
         String startTimeText = task.getStartTime() != null
                 ? task.getStartTime().format(DateTimeFormatter.ISO_DATE_TIME) : "";
@@ -206,20 +207,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         if (task instanceof Epic) {
             taskType = TaskType.EPIC;
         }
-        return String.format("%d,%s,%s,%s,%s,,%s,%s,%s",task.getId(), taskType, task.getName(), task.getStatus(),
+        taskString = String.format("%d,%s,%s,%s,%s,,%s,%s,%s", task.getId(), taskType, task.getName(), task.getStatus(),
                 task.getDescription(), startTimeText, durationText, endTimeText);
-    }
-
-    private String toString(SubTask subTask) {
-        String startTimeText = subTask.getStartTime() != null
-                ? subTask.getStartTime().format(DateTimeFormatter.ISO_DATE_TIME) : "";
-        String endTimeText = subTask.getEndTime() != null
-                ? subTask.getEndTime().format(DateTimeFormatter.ISO_DATE_TIME) : "";
-        String durationText = subTask.getDuration() != null
-                ? subTask.getDuration().toString() : "";
-        return String.format("%d,%s,%s,%s,%s,%d,%s,%s,%s", subTask.getId(), TaskType.SUBTASK, subTask.getName(),
-                subTask.getStatus(), subTask.getDescription(), subTask.getEpicId(),
-                startTimeText, durationText, endTimeText);
+        if (task instanceof SubTask) {
+            taskString = String.format("%d,%s,%s,%s,%s,%d,%s,%s,%s", task.getId(), TaskType.SUBTASK, task.getName(),
+                    task.getStatus(), task.getDescription(), ((SubTask) task).getEpicId(),
+                    startTimeText, durationText, endTimeText);
+        }
+        return taskString;
     }
 
     private Task fromString(String taskValue) throws TaskFormatException {
